@@ -1,1 +1,1 @@
-# Pintora
+# Pintora - Website

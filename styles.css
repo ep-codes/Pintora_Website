@@ -118,6 +118,7 @@ select {
   transform: translateX(3px);
 }
 
+.brand:focus-visible,
 .nav a:focus-visible,
 .auth a:focus-visible,
 .signup:focus-visible,

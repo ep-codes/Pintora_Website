@@ -57,9 +57,29 @@ select {
 }
 
 .brand {
-  font-size: 18px;
-  color: #262632;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 84px;
+}
+
+.brand::before {
+  content: "";
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  background: var(--purple);
+  border-radius: 50% 50% 50% 4px;
+  transform: rotate(-25deg);
+  box-shadow: 5px 4px 0 var(--peach);
+}
+
+.brand strong {
+  color: var(--ink-dark);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .nav {
@@ -397,11 +417,17 @@ p {
 
 .primary-btn,
 .secondary-btn {
+  flex: 1 1 0;
   height: 48px;
-  padding: 0 34px;
+  padding: 0 18px;
   border-radius: 9px;
   font-weight: 600;
   border: 1px solid var(--purple);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .primary-btn {
@@ -470,11 +496,6 @@ p {
 
 .home-category .big-icon {
   font-size: 38px;
-}
-
-.home-category.selected {
-  outline: 4px solid #1b9cf0;
-  outline-offset: -4px;
 }
 
 .continue-card {
@@ -579,5 +600,16 @@ p {
 
   .home-category-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    width: 100%;
   }
 }

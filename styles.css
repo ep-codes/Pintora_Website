@@ -489,7 +489,9 @@ p {
 }
 
 .home-category {
+  width: 100%;
   min-height: 142px;
+  border: 0;
   border-radius: 11px;
   padding: 20px 10px 14px;
   display: flex;
@@ -500,6 +502,18 @@ p {
   text-align: center;
   font-weight: 600;
   color: var(--ink-dark);
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.home-category:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(71, 71, 84, 0.12);
+}
+
+.home-category:focus-visible {
+  outline: 3px solid var(--purple);
+  outline-offset: 3px;
 }
 
 .home-category .big-icon {

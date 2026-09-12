@@ -113,8 +113,16 @@ select {
   display: inline-grid;
   place-items: center;
   flex: 0 0 22px;
-  font-size: 18px;
-  font-weight: 400;
+  color: #747483;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav a.active .icon {
+  color: var(--purple);
 }
 
 .main {

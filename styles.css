@@ -95,6 +95,22 @@ select {
   font-size: 20px;
   font-weight: 600;
   color: #747483;
+  border-radius: 6px;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.nav a:hover {
+  color: var(--purple);
+  transform: translateX(3px);
+}
+
+.nav a:focus-visible,
+.auth a:focus-visible,
+.signup:focus-visible,
+.primary-btn:focus-visible,
+.secondary-btn:focus-visible {
+  outline: 3px solid var(--purple);
+  outline-offset: 4px;
 }
 
 .nav a.active {
@@ -171,12 +187,29 @@ select {
   color: #292933;
 }
 
+.auth a {
+  border-radius: 4px;
+  transition: color 160ms ease;
+}
+
+.auth a:hover {
+  color: var(--purple);
+}
+
 .signup {
   border: 0;
   background: #e6e6e7;
   border-radius: 16px;
   padding: 7px 15px;
   color: #33333b;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.signup:hover {
+  background: var(--purple);
+  color: white;
+  transform: translateY(-1px);
 }
 
 .footer {
@@ -436,6 +469,8 @@ p {
   justify-content: center;
   text-align: center;
   white-space: nowrap;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 .primary-btn {
@@ -447,6 +482,17 @@ p {
   background: var(--bg);
   color: var(--ink-dark);
   border-color: #8d8d97;
+}
+
+.primary-btn:hover,
+.secondary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(71, 71, 84, 0.14);
+}
+
+.secondary-btn:hover {
+  background: var(--purple-soft);
+  border-color: var(--purple);
 }
 
 .hero-art {

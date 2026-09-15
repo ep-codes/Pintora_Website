@@ -533,6 +533,12 @@ p {
   transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
+.compact-title { font-size: 18px; margin-top: 0; }
+.small-title { font-size: 18px; }
+.path-title { margin: 0; font-size: 20px; }
+.paths-grid { margin-top: 18px; }
+.twenty-title { font-size: 20px; }
+
 .primary-btn {
   background: var(--purple);
   color: white;

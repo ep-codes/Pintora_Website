@@ -1,26 +1,7 @@
-import CategoryCard from "@/components/category-card";
-import ContinueLearningCard from "@/components/continue-learning-card";
 import HeroSection from "@/components/hero-section";
 import SiteShell from "@/components/site-shell";
-import TrendingTutorials from "@/components/trending-tutorials";
-
-export const metadata = { title: "Home" };
-const categories = [["✎", "Drawing", "bg-lavender"], ["✦", "Acrylic", "bg-peach"], ["▣", "Digital Art", "bg-blue"], ["◔", "Watercolor", "bg-mint"], ["◉", "Gouache", "bg-pink"]];
-
-export default function HomePage() {
-  return (
-    <SiteShell>
-      <HeroSection />
-      <section className="home-section">
-        <h2 className="section-title purple">What will you create today?</h2>
-        <h3 className="section-title compact-title">Browse by Category</h3>
-        <div className="home-category-grid">{categories.map(([icon, label, color]) => <CategoryCard key={label} icon={icon} label={label} color={color} variant="home" />)}</div>
-      </section>
-      <section className="home-section">
-        <h3 className="section-title small-title">Continue Learning</h3>
-        <ContinueLearningCard />
-      </section>
-      <section className="home-section"><h3 className="section-title small-title">Trending Tutorials</h3><TrendingTutorials /></section>
-    </SiteShell>
-  );
-}
+import LessonBrowser from "@/components/lesson-browser";
+import Link from "next/link";
+export const metadata={title:"Your creative space"};
+const categories=[["✎","Drawing"],["✦","Acrylic"],["▣","Digital Art"],["◔","Watercolor"],["◉","Gouache"]];
+export default function HomePage(){return <SiteShell><HeroSection/><section className="home-section"><div className="section-heading"><div><h2>What will you create today?</h2><p>Browse by Category</p></div></div><div className="home-category-grid">{categories.map(([icon,label],i)=><Link href={`/learn?category=${encodeURIComponent(label)}`} className={`medium medium-${i}`} key={label}><span className="medium-icon">{icon}</span><span>{label}</span></Link>)}</div></section><section className="home-section"><div className="section-heading"><h2 className="subheading">Continue Learning</h2></div><div className="continue-learning"><img src="/art/colors.svg" alt="Abstract purple color study"/><div className="continue-copy"><strong>Color Theory Basics</strong><div className="progress-row"><span className="progress-track"><i/></span><b>72%</b></div></div><Link className="continue-action" href="/learn">Continue <span>→</span></Link></div></section><section className="home-section lesson-section"><div className="section-heading"><h2 className="subheading">Trending Tutorials</h2><Link className="view-all-link" href="/learn">View all</Link></div><LessonBrowser compact/></section></SiteShell>}

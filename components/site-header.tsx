@@ -1,8 +1,2 @@
-import Link from "next/link";
-
-export default function SiteHeader() {
-  return <header className="topbar">
-    <div className="search-wrap"><input className="search" type="search" placeholder="Search" aria-label="Search Pintora" /></div>
-    <div className="auth"><Link href="#">Log In</Link><button className="signup" type="button">Sign Up</button></div>
-  </header>;
-}
+"use client";
+export default function SiteHeader(){return <header className="topbar"><form className="search-wrap" action="/learn"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input className="search" name="q" type="search" placeholder="Search for lessons, topics, or artists…" aria-label="Search lessons"/></form><button className="notification" type="button" aria-label="Notifications"><span>•</span>♧</button><div className="avatar" aria-label="Your profile">P</div></header>}

@@ -42,3 +42,7 @@ export function markLessonCompleted(id: string, stepCount: number) {
   map[id] = { step: stepCount - 1, completed: true, updatedAt: Date.now() };
   writeStoredString(KEY, JSON.stringify(map));
 }
+
+export function clearProgress() {
+  writeStoredString(KEY, null);
+}

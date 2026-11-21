@@ -18,3 +18,7 @@ export function toggleSavedLesson(id: string) {
   const ids = toIds(parseJson(readStoredString(KEY)));
   writeStoredString(KEY, JSON.stringify(ids.includes(id) ? ids.filter((v) => v !== id) : [...ids, id]));
 }
+
+export function clearSavedLessons() {
+  writeStoredString(KEY, null);
+}

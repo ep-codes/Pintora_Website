@@ -29,8 +29,9 @@ function AuthFormContent({ mode, next }: { mode: Mode; next: string | null }) {
   function submit(event: FormEvent) {
     event.preventDefault();
     const cleanEmail = email.trim();
-    // Simulated: the password field is never read or stored.
-    signIn({ email: cleanEmail, name: name.trim() || cleanEmail.split("@")[0] });
+    // Simulated: the password field is never read or stored. Logging in to an email this browser
+    // already knows restores that account; otherwise a new account is created.
+    signIn({ email: cleanEmail, name: mode === "signup" ? name : undefined });
     // RedirectIfSignedIn below navigates as soon as the session updates.
   }
 

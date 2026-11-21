@@ -426,3 +426,108 @@ summary::-webkit-details-marker { display: none; }
   .profile-stats { width: 100%; }
   .profile-stats div { flex: 1; }
 }
+
+/* Theme toggle (both themes) */
+.theme-toggle { width: 40px; height: 40px; flex: 0 0 40px; padding: 0; display: grid; place-items: center; color: var(--indigo); background: rgba(255,255,255,.7); border: 1px solid var(--line); border-radius: 50%; }
+.theme-toggle:hover { color: var(--purple-dark); transform: rotate(-12deg); }
+.theme-toggle .icon { width: 19px; height: 19px; flex-basis: 19px; }
+.public-nav .theme-toggle { width: 38px; height: 38px; flex-basis: 38px; margin-right: 4px; }
+
+/* ---------- Dark theme ----------
+   data-theme is set on <html> by the inline script in app/layout.tsx (see lib/theme-script.ts). */
+:root[data-theme="dark"] {
+  --background: #12111d;
+  --surface: rgba(28,26,46,.82);
+  --sidebar: rgba(28,26,46,.68);
+  --ink: #ecebf7;
+  --indigo: #e6e1ff;
+  --coral: #ef9a87;
+  --muted: #a4a3bc;
+  --line: #2f2c47;
+  --purple: #a283f2;
+  --purple-dark: #bba5ff;
+  --lavender: #2a2547;
+  --peach: #382a2c;
+  --blue: #1e2a3c;
+  --mint: #1c3029;
+  --pink: #37233b;
+  --shadow: 0 16px 42px rgba(0,0,0,.4);
+  /* dark-only helpers */
+  --card: rgba(30,28,49,.8);
+  --card-strong: #2a2744;
+  --card-border: rgba(255,255,255,.07);
+  --field: #1f1d34;
+  --hover: rgba(162,131,242,.14);
+}
+:root[data-theme="dark"] { background: #12111d; }
+:root[data-theme="dark"] body { background: radial-gradient(circle at 12% 78%, rgba(98,74,170,.16), transparent 27rem), radial-gradient(circle at 92% 15%, rgba(170,96,90,.1), transparent 30rem), linear-gradient(135deg,#15141f 0%,#12111d 52%,#161420 100%); }
+
+/* Glass surfaces → dark cards */
+:root[data-theme="dark"] :is(.sidebar,.public-topbar,.lesson-card,.continue-learning,.supply-card,.creation,.course-detail-intro,.discussion-post,.discussion-form,.stat-tile,.mini-lesson,.shortcut-card,.settings-card,.landing-steps li,.auth-card,.artist-badge,.hero-preview,.profile-stats div,.continue-action,.secondary-btn,.theme-toggle,.course-card) { background: var(--card); border-color: var(--card-border); box-shadow: 0 14px 34px rgba(0,0,0,.28); }
+:root[data-theme="dark"] .public-topbar { background: rgba(26,24,42,.96); }
+:root[data-theme="dark"] .sidebar { box-shadow: 0 28px 75px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05); }
+:root[data-theme="dark"] .sidebar::before,:root[data-theme="dark"] .sidebar::after { opacity: .12; }
+:root[data-theme="dark"] .lesson-dialog { background: #1b1930; border-color: var(--line); }
+:root[data-theme="dark"] .secondary-btn { color: var(--ink); border-color: var(--line); }
+:root[data-theme="dark"] .secondary-btn:hover { color: var(--purple-dark); background: var(--card-strong); }
+:root[data-theme="dark"] .continue-action { border-color: var(--line); }
+
+/* Inputs, chips and small white controls → dark fields */
+:root[data-theme="dark"] :is(.search,.filter-row input,.save-filter,.community-toolbar select,.creation button,.discussion-thread input,.discussion-form input,.discussion-form textarea,.discussion-form select,.auth-form input,.settings-form input,.settings-form textarea,.chip,.filter-tabs button,.bookmark,.play-icon,.lesson-duration,.course-symbol,.project-chip,.dialog-close) { color: var(--ink); background: var(--field); border-color: var(--line); box-shadow: none; }
+:root[data-theme="dark"] .search:focus { border-color: #6b62a0; box-shadow: 0 0 0 4px rgba(162,131,242,.15); }
+:root[data-theme="dark"] .search-wrap svg { stroke: var(--ink); }
+:root[data-theme="dark"] .bookmark,:root[data-theme="dark"] .play-icon { color: var(--purple); }
+:root[data-theme="dark"] .bookmark.is-saved { color: white; background: var(--purple); }
+:root[data-theme="dark"] :is(.filter-tabs button:hover,.filter-tabs button.selected,.save-filter.selected,.chip:hover,.chip.selected) { color: var(--purple-dark); background: var(--lavender); border-color: rgba(187,165,255,.3); }
+:root[data-theme="dark"] .segmented label.selected { background: var(--card-strong); box-shadow: 0 3px 10px rgba(0,0,0,.3); }
+:root[data-theme="dark"] .image-open { background: #2a2742; }
+
+/* Navigation */
+:root[data-theme="dark"] :is(.nav a:hover,.nav .nav-logout:hover,.public-nav a:not(.primary-btn):hover) { background: var(--hover); }
+:root[data-theme="dark"] .nav a.active { background: linear-gradient(135deg,rgba(128,86,217,.38),rgba(112,70,200,.24)); box-shadow: none; }
+:root[data-theme="dark"] .nav-divider { background: var(--line); }
+:root[data-theme="dark"] .sidebar-bottom { color: var(--muted); border-color: var(--line); }
+:root[data-theme="dark"] .avatar,:root[data-theme="dark"] .profile-avatar { border-color: #2a2742; }
+
+/* Course cards use fixed pastel classes */
+:root[data-theme="dark"] .course-lavender { background: var(--lavender); }
+:root[data-theme="dark"] .course-peach { background: var(--peach); }
+:root[data-theme="dark"] .course-mint { background: var(--mint); }
+:root[data-theme="dark"] .course-blue { background: var(--blue); }
+:root[data-theme="dark"] .course-pink { background: var(--pink); }
+:root[data-theme="dark"] .course-card-toggle:hover { background: rgba(255,255,255,.04); }
+:root[data-theme="dark"] :is(.course-card-text small,.course-level,.course-projects > p,.course-chevron,.footer) { color: var(--muted); }
+:root[data-theme="dark"] .supply-visual { color: var(--purple-dark); }
+
+/* Tinted panels and banners */
+:root[data-theme="dark"] :is(.empty-state,.quiet-note,.dashboard-empty,.discussion-thread p) { background: rgba(42,37,71,.55); border-color: var(--line); }
+:root[data-theme="dark"] .hero-kicker { color: #f3a896; background: rgba(229,139,120,.15); }
+:root[data-theme="dark"] .profile-hero,:root[data-theme="dark"] .landing-cta { background: linear-gradient(135deg,rgba(80,60,150,.45),rgba(125,66,76,.32)); border-color: var(--card-border); box-shadow: var(--shadow); }
+:root[data-theme="dark"] .creation button.liked { color: #f3a896; background: rgba(229,139,120,.18); }
+:root[data-theme="dark"] .discussion-vote.selected { background: rgba(162,131,242,.3); }
+:root[data-theme="dark"] .discussion-primary { background: #7046c8; }
+
+/* Progress bars and switches */
+:root[data-theme="dark"] .progress-track,:root[data-theme="dark"] .step-progress span { background: #2e2a48; }
+:root[data-theme="dark"] .step-progress span.done { background: var(--purple); }
+:root[data-theme="dark"] .switch { background: #3a3656; }
+:root[data-theme="dark"] .switch:checked { background: var(--purple); }
+
+/* Status and danger colors need more contrast on dark */
+:root[data-theme="dark"] .settings-status.saved { color: #7fd6a4; }
+:root[data-theme="dark"] .settings-status.error { color: #ff9b92; }
+:root[data-theme="dark"] .danger-outline-btn { color: #ff9b92; background: transparent; border-color: rgba(255,120,110,.35); }
+:root[data-theme="dark"] .danger-outline-btn:hover { background: rgba(255,120,110,.1); }
+
+/* Decorative background shapes */
+:root[data-theme="dark"] .workspace::before { border-bottom-color: rgba(120,110,170,.08); }
+:root[data-theme="dark"] .workspace::after { opacity: .2; }
+:root[data-theme="dark"] .home-layout::before { background: linear-gradient(135deg,rgba(80,64,140,.35),rgba(120,70,80,.22)); }
+:root[data-theme="dark"] .home-layout::after { border-bottom-color: rgba(120,110,170,.1); }
+:root[data-theme="dark"] .hero-blob { background: linear-gradient(135deg,rgba(64,54,112,.75),rgba(54,44,92,.7)); box-shadow: 0 28px 70px rgba(0,0,0,.3); }
+
+/* Keep the logged-out top bar on one row on narrow phones */
+.public-nav a { white-space: nowrap; }
+@media (max-width:420px) {
+  .public-topbar .brand strong { display: none; }
+}

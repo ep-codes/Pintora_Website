@@ -5,6 +5,13 @@ import { lessons } from "@/lib/lessons";
 import { clearProgress, useProgress } from "@/lib/progress";
 import { clearSavedLessons, useSavedLessons } from "@/lib/saved";
 import { deleteAccount, signOut, skillLevels, updateAccount, useSession, type Account, type Preferences } from "@/lib/session";
+import { setThemePreference, useThemePreference, type ThemePreference } from "@/lib/theme";
+
+const themeOptions: { value: ThemePreference; label: string }[] = [
+  { value: "system", label: "Match my device" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
 
 const mediumOptions = courses["Based on Medium"].map((course) => course.name);
 
@@ -63,6 +70,8 @@ function ProfileContent({ account }: { account: Account }) {
       </fieldset>
     </SettingsCard>
 
+    <AppearanceSettings />
+
     <SettingsCard title="Notifications" description="Email isn't connected yet. Your choices are saved for when it is.">
       <Toggle label="Weekly inspiration" hint="A few new lessons and community favorites, once a week." checked={account.preferences.weeklyDigest} onChange={(weeklyDigest) => setPreferences({ weeklyDigest })} />
       <Toggle label="Replies to my discussions" hint="Know when someone answers your question or post." checked={account.preferences.replyEmails} onChange={(replyEmails) => setPreferences({ replyEmails })} />
@@ -111,6 +120,20 @@ function ProfileForm({ account }: { account: Account }) {
         <span role="status" className={`settings-status ${status?.kind ?? ""}`}>{status?.text}</span>
       </div>
     </form>
+  </SettingsCard>;
+}
+
+function AppearanceSettings() {
+  const preference = useThemePreference();
+  return <SettingsCard title="Appearance" description="Choose how Pintora looks on this device. You can also switch with the sun and moon button at the top.">
+    <fieldset className="settings-fieldset">
+      <legend>Theme</legend>
+      <div className="segmented">
+        {themeOptions.map(({ value, label }) => <label key={value} className={preference === value ? "selected" : ""}>
+          <input type="radio" name="theme" value={value} checked={preference === value} onChange={() => setThemePreference(value)} />{label}
+        </label>)}
+      </div>
+    </fieldset>
   </SettingsCard>;
 }
 

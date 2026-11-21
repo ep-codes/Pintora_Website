@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export type IconName = "home" | "learn" | "explore" | "materials" | "community" | "discussion" | "profile" | "saved" | "logout";
+export type IconName = "home" | "learn" | "explore" | "materials" | "community" | "discussion" | "profile" | "saved" | "logout" | "sun" | "moon";
 
 const paths: Record<IconName, ReactNode> = {
   home: <><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" /><path d="M9 21v-7h6v7" /></>,
@@ -11,7 +11,9 @@ const paths: Record<IconName, ReactNode> = {
   discussion: <path d="M4 4h16v12H9l-5 4z" />,
   profile: <><circle cx="12" cy="8" r="4" /><path d="M5 21a7 7 0 0 1 14 0" /></>,
   saved: <path d="m6 3 6 3 6-3v18l-6-3-6 3z" />,
-  logout: <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+  logout: <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />,
+  sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></>,
+  moon: <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
 };
 
 export function Icon({ name }: { name: IconName }) {

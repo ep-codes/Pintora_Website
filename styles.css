@@ -431,7 +431,7 @@ summary::-webkit-details-marker { display: none; }
 .theme-toggle { width: 40px; height: 40px; flex: 0 0 40px; padding: 0; display: grid; place-items: center; color: var(--indigo); background: rgba(255,255,255,.7); border: 1px solid var(--line); border-radius: 50%; }
 .theme-toggle:hover { color: var(--purple-dark); transform: rotate(-12deg); }
 .theme-toggle .icon { width: 19px; height: 19px; flex-basis: 19px; }
-.public-nav .theme-toggle { width: 38px; height: 38px; flex-basis: 38px; margin-right: 4px; }
+.public-nav .theme-toggle { width: 38px; height: 38px; flex-basis: 38px; margin-left: 8px; }
 
 /* ---------- Dark theme ----------
    data-theme is set on <html> by the inline script in app/layout.tsx (see lib/theme-script.ts). */
@@ -530,4 +530,18 @@ summary::-webkit-details-marker { display: none; }
 .public-nav a { white-space: nowrap; }
 @media (max-width:420px) {
   .public-topbar .brand strong { display: none; }
+}
+
+/* Logo mark (components/logo.tsx) */
+.brand-mark { flex: 0 0 auto; background: linear-gradient(135deg,#8056d9 0%,#b46fb4 55%,#e58b78 100%); border-radius: 12px; box-shadow: 0 8px 20px rgba(128,86,217,.28), inset 0 1px 0 rgba(255,255,255,.25); }
+.brand-mark svg { width: 72%; height: 72%; }
+.brand strong { letter-spacing: -.6px; }
+:root[data-theme="dark"] .brand-mark { box-shadow: 0 8px 22px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.18); }
+
+/* Logged-out pages: theme toggle in the window's top-right corner when there's room beside the
+   centered bar (≥1360px); below that it stays at the end of the bar. Vertically centered on the bar. */
+.public-theme-corner { display: none; position: fixed; z-index: 11; top: 25px; right: 24px; }
+@media (min-width:1360px) {
+  .public-theme-corner { display: block; }
+  .public-nav .theme-toggle { display: none; }
 }

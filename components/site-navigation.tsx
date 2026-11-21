@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon, type IconName } from "@/components/icons";
+import { LogoMark } from "@/components/logo";
 import { signOut } from "@/lib/session";
 
 const links: { href: string; label: string; icon: IconName }[] = [
@@ -17,7 +18,7 @@ export default function SiteNavigation() {
   // Section links stay highlighted on their sub-pages, e.g. Learn on /learn/watercolor.
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   return <aside className="sidebar">
-    <Link className="brand" href="/home" aria-label="Pintora dashboard"><span className="brand-mark">✎</span><strong>Pintora</strong></Link>
+    <Link className="brand" href="/home" aria-label="Pintora dashboard"><LogoMark /><strong>Pintora</strong></Link>
     <nav className="nav" aria-label="Main navigation">
       {links.map((link) => <Link key={link.href} href={link.href} className={isActive(link.href) ? "active" : ""}><Icon name={link.icon} />{link.label}</Link>)}
       <div className="nav-divider" />

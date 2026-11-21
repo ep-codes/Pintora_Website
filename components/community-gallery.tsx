@@ -1,4 +1,27 @@
 "use client";
 import { useState } from "react";
-const works=[{title:"Slow Sunday mornings",artist:"Emma R.",image:"still-life",medium:"Gouache",likes:42},{title:"Somewhere quiet",artist:"Oliver C.",image:"landscape",medium:"Watercolor",likes:68},{title:"Finding my palette",artist:"Sofia L.",image:"colors",medium:"Acrylic",likes:35},{title:"Objects on my desk",artist:"Alex M.",image:"drawing",medium:"Drawing",likes:27}];
-export default function CommunityGallery(){const [topic,setTopic]=useState("All mediums");const [sort,setSort]=useState("Featured");const [liked,setLiked]=useState<string[]>([]);return <><div className="community-toolbar"><div className="filter-tabs">{["All mediums","Watercolor","Drawing","Acrylic","Gouache"].map(t=><button key={t} onClick={()=>setTopic(t)} aria-pressed={t===topic} className={t===topic?"selected":""}>{t}</button>)}</div><select aria-label="Sort artwork" value={sort} onChange={e=>setSort(e.target.value)}><option>Featured</option><option>Most appreciated</option></select></div><p className="gallery-note">A small collection of studio studies to spark your next idea.</p><div className="community-grid">{works.filter(w=>topic==="All mediums"||w.medium===topic).sort((a,b)=>sort==="Featured"?0:b.likes-a.likes).map(w=><article className="creation" key={w.title}><img src={`/art/${w.image}.svg`} alt={`${w.title}, a ${w.medium.toLowerCase()} study`}/><div className="creation-detail"><div><div className="eyebrow">{w.medium}</div><h2>{w.title}</h2><p>by {w.artist}</p></div><button className={liked.includes(w.title)?"liked":""} aria-label={`Appreciate ${w.title}`} aria-pressed={liked.includes(w.title)} onClick={()=>setLiked(liked.includes(w.title)?liked.filter(t=>t!==w.title):[...liked,w.title])}>{liked.includes(w.title)?"♥":"♡"} {w.likes+(liked.includes(w.title)?1:0)}</button></div></article>)}</div></>}
+import { works } from "@/lib/gallery";
+export default function CommunityGallery() {
+  const [topic, setTopic] = useState("All mediums");
+  const [sort, setSort] = useState("Most recent");
+  const [liked, setLiked] = useState<string[]>([]);
+  const visibleWorks = works
+    .filter((work) => topic === "All mediums" || work.medium === topic)
+    .sort((a, b) => sort === "Most liked" ? b.likes - a.likes : works.indexOf(b) - works.indexOf(a));
+
+  return <>
+    <div className="community-toolbar">
+      <div className="filter-tabs">{["All mediums", "Watercolor", "Drawing", "Acrylic", "Gouache"].map((medium) => <button key={medium} onClick={() => setTopic(medium)} aria-pressed={medium === topic} className={medium === topic ? "selected" : ""}>{medium}</button>)}</div>
+      <select aria-label="Sort artwork" value={sort} onChange={(event) => setSort(event.target.value)}>
+        <option>Most liked</option>
+        <option>Most recent</option>
+      </select>
+    </div>
+    <div className="community-grid">{visibleWorks.map((work) => <article className="creation" key={work.title}>
+      <img src={`/art/${work.image}.svg`} alt={`${work.title}, a ${work.medium.toLowerCase()} study`} />
+      <div className="creation-detail"><div><div className="eyebrow">{work.medium}</div><h2>{work.title}</h2><p>by {work.artist}</p></div>
+        <button className={liked.includes(work.title) ? "liked" : ""} aria-label={`Appreciate ${work.title}`} aria-pressed={liked.includes(work.title)} onClick={() => setLiked(liked.includes(work.title) ? liked.filter((title) => title !== work.title) : [...liked, work.title])}>{liked.includes(work.title) ? "♥" : "♡"} {work.likes + (liked.includes(work.title) ? 1 : 0)}</button>
+      </div>
+    </article>)}</div>
+  </>;
+}

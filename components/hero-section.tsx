@@ -6,8 +6,8 @@ export default function HeroSection() {
       <h1>Be <span>Creative.</span><br />Learn new skills.<br />Excel in a new hobby.</h1>
       <p>A free learning platform for artists of all levels. Learn new skills, explore art topics, and share your creations with a creative community.</p>
       <div className="hero-actions">
-        <Link className="primary-btn" href="/learn">Start Learning <span>→</span></Link>
-        <Link className="secondary-btn" href="/community">Explore Community</Link>
+        <Link className="primary-btn" href="/signup">Join for free <span>→</span></Link>
+        <Link className="secondary-btn" href="/#try">Try a free lesson</Link>
       </div>
     </div>
     <div className="hero-visual" aria-label="Featured art lesson preview">

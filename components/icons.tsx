@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export type IconName = "home" | "learn" | "explore" | "materials" | "community" | "profile" | "saved";
+export type IconName = "home" | "learn" | "explore" | "materials" | "community" | "discussion" | "profile" | "saved" | "logout";
 
 const paths: Record<IconName, ReactNode> = {
   home: <><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" /><path d="M9 21v-7h6v7" /></>,
@@ -8,8 +8,10 @@ const paths: Record<IconName, ReactNode> = {
   explore: <><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z" /></>,
   materials: <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z" />,
   community: <><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /><circle cx="9.5" cy="7" r="4" /></>,
+  discussion: <path d="M4 4h16v12H9l-5 4z" />,
   profile: <><circle cx="12" cy="8" r="4" /><path d="M5 21a7 7 0 0 1 14 0" /></>,
-  saved: <path d="m6 3 6 3 6-3v18l-6-3-6 3z" />
+  saved: <path d="m6 3 6 3 6-3v18l-6-3-6 3z" />,
+  logout: <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
 };
 
 export function Icon({ name }: { name: IconName }) {

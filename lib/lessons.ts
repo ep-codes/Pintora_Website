@@ -5,3 +5,5 @@ export const lessons = [
  {id:"gouache",title:"A still life, one brushstroke at a time",category:"Gouache",duration:"30 min",level:"Beginner",image:"still-life",teacher:"with Emma Rivers",description:"Give everyday objects new life with rich, opaque color.",steps:["Arrange a vase and a piece of fruit on a plain surface.","Draw their silhouettes lightly, leaving room around the objects.","Mix gouache to a creamy consistency. Block in the background and large shapes.","Let the first layer dry, then add shadows and small highlights with confident strokes."]},
  {id:"digital",title:"Create a playful digital color study",category:"Digital Art",duration:"20 min",level:"Beginner",image:"colors",teacher:"with Oliver Chen",description:"Experiment with shape, layers, and a palette that feels like you.",steps:["Open your drawing app and create a square canvas.","Choose three colors and add each large shape on a separate layer.","Try changing the order of your layers to explore overlapping shapes.","Add a textured brush accent and export your finished study."]}
 ];
+
+export type Lesson = (typeof lessons)[number];

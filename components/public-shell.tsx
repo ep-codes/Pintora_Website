@@ -1,14 +1,14 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import ThemeToggle from "@/components/theme-toggle";
-import { LogoMark } from "@/components/logo";
+import { Logo } from "@/components/logo";
 
 // Layout for logged-out pages: landing, log in, sign up.
 export default function PublicShell({ children }: { children: ReactNode }) {
   return <div className="public-shell">
     <a className="skip-link" href="#main">Skip to content</a>
     <header className="public-topbar">
-      <Link className="brand" href="/" aria-label="Pintora home"><LogoMark /><strong>Pintora</strong></Link>
+      <Link className="brand" href="/" aria-label="Pintora home"><Logo markOnNarrow /></Link>
       <nav className="public-nav" aria-label="Main navigation">
         <Link className="public-nav-section" href="/#try">Free lessons</Link>
         <Link className="public-nav-section" href="/#how">How it works</Link>

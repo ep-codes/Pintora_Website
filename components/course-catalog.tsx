@@ -5,6 +5,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { courses, courseSlug } from "@/lib/courses";
+import SymbolGlyph from "@/components/symbol-glyph";
 
 type CourseGroup = keyof typeof courses;
 type Course = (typeof courses)[CourseGroup][number];
@@ -56,7 +57,7 @@ function CatalogContent({ query }: { query: string }) {
 function CourseCard({ course }: { course: Course }) {
   return <article className={`course-card course-${course.color}`}>
     <Link className="course-card-toggle" href={`/learn/${courseSlug(course.name)}`}>
-      <span className="course-symbol" aria-hidden="true">{course.symbol}</span>
+      <span className="course-symbol" aria-hidden="true"><SymbolGlyph value={course.symbol} /></span>
       <span className="course-card-text"><strong>{course.name}</strong><small>Explore lessons and projects</small></span>
     </Link>
   </article>;

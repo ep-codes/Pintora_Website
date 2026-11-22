@@ -5,7 +5,8 @@ import { lessons } from "@/lib/lessons";
 import { clearProgress, useProgress } from "@/lib/progress";
 import { clearSavedLessons, useSavedLessons } from "@/lib/saved";
 import { deleteAccount, signOut, skillLevels, updateAccount, useSession, type Account, type Preferences } from "@/lib/session";
-import { setThemePreference, useThemePreference, type ThemePreference } from "@/lib/theme";
+import { setAccent, setThemePreference, useAccent, useThemePreference, type Accent, type ThemePreference } from "@/lib/theme";
+import { accents } from "@/lib/theme-script";
 
 const themeOptions: { value: ThemePreference; label: string }[] = [
   { value: "system", label: "Match my device" },
@@ -123,14 +124,28 @@ function ProfileForm({ account }: { account: Account }) {
   </SettingsCard>;
 }
 
+const accentLabels: Record<Accent, string> = { purple: "Purple", orange: "Orange", pink: "Pink", blue: "Blue", green: "Green", grey: "Grey" };
+
 function AppearanceSettings() {
   const preference = useThemePreference();
+  const accent = useAccent();
   return <SettingsCard title="Appearance" description="Choose how Pintora looks on this device. You can also switch with the sun and moon button at the top.">
     <fieldset className="settings-fieldset">
       <legend>Theme</legend>
       <div className="segmented">
         {themeOptions.map(({ value, label }) => <label key={value} className={preference === value ? "selected" : ""}>
           <input type="radio" name="theme" value={value} checked={preference === value} onChange={() => setThemePreference(value)} />{label}
+        </label>)}
+      </div>
+    </fieldset>
+    <fieldset className="settings-fieldset">
+      <legend>Accent color</legend>
+      <p className="settings-hint">Used for buttons, links and highlights across the site.</p>
+      <div className="accent-options">
+        {accents.map((value) => <label key={value} className={`accent-option${accent === value ? " selected" : ""}`}>
+          <input type="radio" name="accent" value={value} checked={accent === value} onChange={() => setAccent(value)} />
+          {/* data-accent gives the swatch that accent's colors, whatever the page's current accent is. */}
+          <span className="accent-swatch" data-accent={value} aria-hidden="true" />{accentLabels[value]}
         </label>)}
       </div>
     </fieldset>

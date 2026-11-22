@@ -5,6 +5,7 @@ import LessonBrowser from "@/components/lesson-browser";
 import { RedirectIfSignedIn } from "@/components/auth-gate";
 import { courses, courseSlug, featuredMediums } from "@/lib/courses";
 import { works } from "@/lib/gallery";
+import SymbolGlyph from "@/components/symbol-glyph";
 
 export const metadata = { title: "Your creative space" };
 
@@ -30,7 +31,7 @@ export default function LandingPage() {
     <section className="landing-section" aria-labelledby="mediums-heading">
       <div className="section-heading"><div><h2 id="mediums-heading">What will you create?</h2><p className="landing-lede">Join free to unlock every course.</p></div></div>
       <div className="home-category-grid">
-        {featuredMediums.map(({ icon, label, course }) => <Link key={label} className="medium" href={`/signup?next=${encodeURIComponent(`/learn/${courseSlug(course)}`)}`}><span className="medium-icon">{icon}</span><span>{label}</span></Link>)}
+        {featuredMediums.map(({ icon, label, course }) => <Link key={label} className="medium" href={`/signup?next=${encodeURIComponent(`/learn/${courseSlug(course)}`)}`}><span className="medium-icon"><SymbolGlyph value={icon} /></span><span>{label}</span></Link>)}
       </div>
     </section>
 

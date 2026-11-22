@@ -6,7 +6,7 @@ export const courses = {
     { name: "Charcoal", symbol: "◌", color: "blue" },
     { name: "Oil Pastels", symbol: "〰", color: "pink" },
     { name: "Oil Paint", symbol: "◍", color: "lavender" },
-    { name: "Traditional / Pencil / Drawing", symbol: "✎", color: "peach", level: "Easy", projects: ["Rose", "Swan", "Fish", "Bear", "Galaxy"] },
+    { name: "Traditional / Pencil / Drawing", symbol: "/icons/pencil.png", color: "peach", level: "Easy", projects: ["Rose", "Swan", "Fish", "Bear", "Galaxy"] },
     { name: "Inking · Pens", symbol: "╱", color: "blue" },
     { name: "Acrylic Markers", symbol: "▰", color: "mint" },
     { name: "Alcohol Markers", symbol: "▥", color: "pink" },
@@ -36,7 +36,7 @@ export const courseSlug = (name: string) => name.toLowerCase().replace(/[^a-z0-9
 
 // Medium tiles shown on the landing page and dashboard. `course` must match a course name above.
 export const featuredMediums = [
-  { icon: "✎", label: "Drawing", course: "Traditional / Pencil / Drawing" },
+  { icon: "/icons/pencil.png", label: "Drawing", course: "Traditional / Pencil / Drawing" },
   { icon: "✦", label: "Acrylic", course: "Acrylic Paint" },
   { icon: "▣", label: "Digital Art", course: "Digital Art" },
   { icon: "◔", label: "Watercolor", course: "Watercolor" },

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteShell from "@/components/site-shell";
 import { courses, courseSlug } from "@/lib/courses";
+import SymbolGlyph from "@/components/symbol-glyph";
 
 const allCourses = Object.values(courses).flat();
 
@@ -22,7 +23,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
       <h1>Explore <em>{course.name}.</em></h1>
       <p>Start with a little inspiration and make something your own.</p>
     </section>
-    <div className="course-detail-intro"><span className="course-symbol" aria-hidden="true">{course.symbol}</span><div><h2>Your creative starting point</h2><p>Explore {course.name.toLowerCase()} through these beginner-friendly project ideas. Try a simple study first, then experiment with your own colors and composition.</p></div></div>
+    <div className="course-detail-intro"><span className="course-symbol" aria-hidden="true"><SymbolGlyph value={course.symbol} /></span><div><h2>Your creative starting point</h2><p>Explore {course.name.toLowerCase()} through these beginner-friendly project ideas. Try a simple study first, then experiment with your own colors and composition.</p></div></div>
     <h2 className="course-detail-heading">Projects to try</h2>
     <div className="course-grid">{projects.map((project, index) => <article className={`course-card course-${course.color} course-detail-card`} key={project}><span className="course-level">PROJECT {String(index + 1).padStart(2, "0")} · BEGINNER</span><h3>{project}</h3><p>Gather your materials, sketch out an idea, and create your own take on {project.toLowerCase()}.</p></article>)}</div>
   </SiteShell>;

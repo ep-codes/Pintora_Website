@@ -1,4 +1,28 @@
 "use client";
 import { useState } from "react";
-const materials=[{icon:"◒",name:"Watercolor paints",type:"Paint",intro:"A little pigment, a little water, a world of possibility.",tip:"Start with a small student-grade set of primary colors. A mixing palette and two jars of water are all you need.",color:"mint"},{icon:"✎",name:"Drawing pencils",type:"Drawing",intro:"The simplest tool is often the most expressive.",tip:"An HB pencil is a versatile starting point. Add a 2B for deeper shadows and a kneaded eraser to lift highlights.",color:"sand"},{icon:"▱",name:"Paper & sketchbooks",type:"Paper",intro:"Give your ideas a place to land.",tip:"Choose smooth paper for pencil and heavier, 300 gsm paper for watercolor. A small sketchbook makes daily practice easier.",color:"rose"},{icon:"╱",name:"Brushes",type:"Tools",intro:"Find a brush that feels like an extension of you.",tip:"One medium round synthetic brush handles washes, details, and loose marks. Rinse thoroughly and dry flat after use.",color:"sand"},{icon:"◉",name:"Gouache & acrylic",type:"Paint",intro:"Rich color for bold ideas and quiet studies alike.",tip:"Gouache can be reactivated with water. Acrylic dries permanently, so keep your brushes wet while working and clean them promptly.",color:"rose"},{icon:"⌘",name:"Digital essentials",type:"Tools",intro:"An entire studio, right at your fingertips.",tip:"Use the drawing app you already have. Start with a simple round brush and learn layers before expanding your brush collection.",color:"mint"}];
-export default function MaterialsLibrary(){const [filter,setFilter]=useState("All materials");return <><div className="filter-tabs">{["All materials","Paint","Drawing","Paper","Tools"].map(f=><button key={f} className={f===filter?"selected":""} aria-pressed={f===filter} onClick={()=>setFilter(f)}>{f}</button>)}</div><div className="materials-grid">{materials.filter(m=>filter==="All materials"||m.type===filter).map(m=><article className="supply-card" key={m.name}><div className={`supply-visual ${m.color}`} aria-hidden="true">{m.icon}</div><div className="eyebrow">{m.type}</div><h2>{m.name}</h2><p>{m.intro}</p><details><summary>A beginner’s guide <span>+</span></summary><p>{m.tip}</p></details></article>)}</div><div className="quiet-note">A reminder from the studio: you don’t need perfect supplies to make something wonderful.</div></>}
+import { materials, materialTypes, type MaterialType } from "@/lib/materials";
+import SymbolGlyph from "@/components/symbol-glyph";
+
+type Filter = "All materials" | MaterialType;
+const filters: Filter[] = ["All materials", ...materialTypes];
+
+export default function MaterialsLibrary() {
+  const [filter, setFilter] = useState<Filter>("All materials");
+  const visible = materials.filter((m) => filter === "All materials" || m.type === filter);
+
+  return <>
+    <div className="filter-tabs" role="group" aria-label="Filter materials">
+      {filters.map((f) => <button key={f} className={f === filter ? "selected" : ""} aria-pressed={f === filter} onClick={() => setFilter(f)}>{f}</button>)}
+    </div>
+    <div className="materials-grid">
+      {visible.map((m) => <article className="supply-card" key={m.name}>
+        <div className={`supply-visual ${m.color}`} aria-hidden="true"><SymbolGlyph value={m.icon} /></div>
+        <div className="eyebrow">{m.type}</div>
+        <h2>{m.name}</h2>
+        <p>{m.intro}</p>
+        <p className="supply-tip">{m.tip}</p>
+      </article>)}
+    </div>
+    <div className="quiet-note">A reminder from the studio: you don’t need perfect supplies to make something wonderful.</div>
+  </>;
+}

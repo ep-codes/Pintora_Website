@@ -6,6 +6,7 @@ import { courseSlug, featuredMediums } from "@/lib/courses";
 import { lessons, type Lesson } from "@/lib/lessons";
 import { useProgress } from "@/lib/progress";
 import { useSavedLessons } from "@/lib/saved";
+import SymbolGlyph from "@/components/symbol-glyph";
 import { useSession } from "@/lib/session";
 
 const lessonHref = (lesson: Lesson) => `/learn?lesson=${lesson.id}#lessons`;
@@ -60,7 +61,7 @@ export default function Dashboard() {
     <section className="home-section" aria-labelledby="mediums-heading">
       <div className="section-heading"><h2 className="subheading" id="mediums-heading">Explore by medium</h2><Link className="view-all-link" href="/learn">All courses</Link></div>
       <div className="home-category-grid">
-        {featuredMediums.map(({ icon, label, course }) => <Link key={label} className="medium" href={`/learn/${courseSlug(course)}`}><span className="medium-icon">{icon}</span><span>{label}</span></Link>)}
+        {featuredMediums.map(({ icon, label, course }) => <Link key={label} className="medium" href={`/learn/${courseSlug(course)}`}><span className="medium-icon"><SymbolGlyph value={icon} /></span><span>{label}</span></Link>)}
       </div>
     </section>
 

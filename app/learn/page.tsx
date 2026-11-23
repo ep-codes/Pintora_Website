@@ -13,7 +13,7 @@ export default function LearnPage() {
     </section>
     <CourseCatalog />
     <section className="home-section" id="lessons" aria-labelledby="lessons-heading">
-      <div className="section-heading"><h2 className="subheading" id="lessons-heading">Guided lessons</h2></div>
+      <div className="section-heading"><h2 className="subheading" id="lessons-heading">Popular tutorials</h2></div>
       <LessonBrowser />
     </section>
   </SiteShell>;

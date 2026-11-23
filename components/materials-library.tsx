@@ -20,7 +20,6 @@ export default function MaterialsLibrary() {
         <div className="eyebrow">{m.type}</div>
         <h2>{m.name}</h2>
         <p>{m.intro}</p>
-        <p className="supply-tip">{m.tip}</p>
       </article>)}
     </div>
     <div className="quiet-note">A reminder from the studio: you don’t need perfect supplies to make something wonderful.</div>

@@ -1,5 +1,5 @@
 export const courses = {
-  "Based on Medium": [
+  "Mediums": [
     { name: "Watercolor", symbol: "◒", color: "lavender", level: "Easy", projects: ["Beach", "Feathers"] },
     { name: "Acrylic Paint", symbol: "✦", color: "peach" },
     { name: "Gouache", symbol: "◉", color: "mint" },
@@ -13,13 +13,13 @@ export const courses = {
     { name: "Origami · Paper", symbol: "◇", color: "lavender", level: "Easy", projects: ["Duck", "Fox", "Rose", "Butterfly", "Swan", "Crane"] },
     { name: "Digital Art", symbol: "▣", color: "blue" },
   ],
-  "Based on Art Styles": [
+  "Art Styles": [
     { name: "Anime / Manga", symbol: "✧", color: "pink" },
     { name: "Minimalist Vector Art", symbol: "◈", color: "blue" },
     { name: "Impressionist", symbol: "✳", color: "peach" },
     { name: "Studio Ghibli", symbol: "☁", color: "mint" },
   ],
-  "Based on Theme": [
+  "Themes": [
     { name: "Space & Galaxy", symbol: "✦", color: "blue" },
     { name: "Stickers", symbol: "✿", color: "pink" },
     { name: "Wallpapers", symbol: "▧", color: "lavender" },

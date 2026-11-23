@@ -5,7 +5,7 @@ import { SettingsCard } from "@/components/settings-ui";
 import { courses } from "@/lib/courses";
 import { cleanUsername, skillLevels, updateAccount, USERNAME_MAX, useSession, type Account, type Preferences } from "@/lib/session";
 
-const mediumOptions = courses["Based on Medium"].map((course) => course.name);
+const mediumOptions = courses["Mediums"].map((course) => course.name);
 
 // How the signed-in artist appears and what they like to make. Email, theme and notifications are in
 // Settings (components/settings-view.tsx). Rendered inside RequireSession.

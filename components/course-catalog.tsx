@@ -12,6 +12,10 @@ type Course = (typeof courses)[CourseGroup][number];
 
 const allCourses: readonly Course[] = Object.values(courses).flat();
 
+// "Courses" shows every course; the rest are the groups in lib/courses.ts.
+const tabs: ["Courses", ...CourseGroup[]] = ["Courses", ...(Object.keys(courses) as CourseGroup[])];
+type Tab = (typeof tabs)[number];
+
 function matches(course: Course, query: string) {
   const projects: readonly string[] = "projects" in course ? course.projects : [];
   return [course.name, ...projects].some((text) => text.toLowerCase().includes(query));
@@ -29,7 +33,8 @@ function CatalogFromUrl() {
 }
 
 function CatalogContent({ query }: { query: string }) {
-  const [group, setGroup] = useState<CourseGroup>("Based on Medium");
+  const [tab, setTab] = useState<Tab>("Courses");
+  const visible: readonly Course[] = tab === "Courses" ? allCourses : courses[tab];
 
   if (query) {
     const results = allCourses.filter((course) => matches(course, query.toLowerCase()));
@@ -46,10 +51,10 @@ function CatalogContent({ query }: { query: string }) {
 
   return <section className="course-catalog" aria-label="Browse courses">
     <div className="filter-tabs" role="group" aria-label="Course categories">
-      {(Object.keys(courses) as CourseGroup[]).map((name) => <button key={name} aria-pressed={group === name} className={group === name ? "selected" : ""} onClick={() => { setGroup(name); }}>{name}</button>)}
+      {tabs.map((name) => <button key={name} aria-pressed={tab === name} className={tab === name ? "selected" : ""} onClick={() => setTab(name)}>{name}</button>)}
     </div>
     <div className="course-grid">
-      {courses[group].map((course) => <CourseCard course={course} key={course.name} />)}
+      {visible.map((course) => <CourseCard course={course} key={course.name} />)}
     </div>
   </section>;
 }
@@ -58,7 +63,7 @@ function CourseCard({ course }: { course: Course }) {
   return <article className={`course-card course-${course.color}`}>
     <Link className="course-card-toggle" href={`/learn/${courseSlug(course.name)}`}>
       <span className="course-symbol" aria-hidden="true"><SymbolGlyph value={course.symbol} /></span>
-      <span className="course-card-text"><strong>{course.name}</strong><small>Explore lessons and projects</small></span>
+      <strong className="course-card-text">{course.name}</strong>
     </Link>
   </article>;
 }

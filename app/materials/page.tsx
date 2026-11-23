@@ -8,7 +8,7 @@ export default function MaterialsPage() {
     <section className="page-intro">
       <div className="eyebrow">A BEGINNER’S GUIDE</div>
       <h1>Good things start<br /><em>with simple materials.</em></h1>
-      <p>A beginner’s guide to the supplies used in every Pintora course: what each one is good for, and what to get first.</p>
+      <p>A beginner’s guide to the supplies used in every Pintora course, and what each one is good for.</p>
     </section>
     <MaterialsLibrary />
   </SiteShell>;

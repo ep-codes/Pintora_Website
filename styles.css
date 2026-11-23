@@ -325,10 +325,20 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
 .auth-form label { display: grid; gap: 6px; color: var(--indigo); font-size: 13px; font-weight: 600; }
 .auth-form input { width: 100%; padding: 12px 14px; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 12px; }
 .auth-form .primary-btn { width: 100%; margin-top: 6px; }
-.auth-preview-note { margin: 18px 0 0; padding: 10px 12px; color: var(--muted); background: var(--lavender); border-radius: 12px; font-size: 12px; }
+.auth-lede strong { color: var(--ink); overflow-wrap: anywhere; }
+.auth-lede a,.auth-forgot { color: var(--accent-strong); font-weight: 600; }
+.auth-forgot { justify-self: start; margin-top: -6px; font-size: 13px; }
+.auth-hint { color: var(--muted); font-weight: 400; }
+.auth-message { margin: 0; padding: 10px 13px; border-radius: 12px; font-size: 13px; }
+.auth-message:empty { display: none; }
+.auth-message.error { color: #a5352e; background: #fdeeec; }
+.auth-message.info { color: var(--ink); background: var(--lavender); }
+.auth-form .primary-btn:disabled,.auth-resend .secondary-btn:disabled { opacity: .6; cursor: default; transform: none; }
+.auth-resend { margin-top: 16px; display: grid; gap: 10px; }
+.auth-card > a.primary-btn { width: 100%; }
 .auth-switch { margin: 18px 0 0; color: var(--muted); font-size: 14px; text-align: center; }
 .auth-switch a { color: var(--accent-strong); font-weight: 700; }
-.auth-pending { min-height: 100vh; display: grid; place-items: center; color: var(--muted); }
+.auth-pending { min-height: 100vh; padding: 20px; display: grid; place-items: center; color: var(--muted); text-align: center; }
 
 /* Signed-in sidebar */
 /* Short windows: tighten the sidebar so every link stays reachable */
@@ -343,6 +353,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
 
 /* Dashboard */
 .dashboard-intro { padding-bottom: 20px; }
+.username-card { margin-bottom: 20px; padding: 20px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; background: linear-gradient(110deg,var(--accent-tint),var(--peach)); border: 1px solid var(--accent-soft); border-radius: 20px; }
+.username-card > div:first-child { flex: 1 1 260px; min-width: 0; }
+.username-card h2 { margin: 0 0 2px; font-size: 18px; }
+.username-card p { margin: 0; color: var(--muted); font-size: 14px; }
+.username-card strong { color: var(--ink); overflow-wrap: anywhere; }
+.username-card-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.username-card-actions > * { min-height: 42px; padding: 0 20px; font-size: 13.5px; }
 .dashboard-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 15px; }
 .stat-tile { padding: 18px 20px; display: grid; gap: 2px; background: rgba(255,255,255,.66); border: 1px solid rgba(255,255,255,.9); border-radius: 18px; box-shadow: 0 10px 25px rgba(60,42,114,.05); }
 .stat-tile strong { color: var(--indigo); font-size: 30px; line-height: 1.1; letter-spacing: -1px; }
@@ -460,12 +477,16 @@ button.profile-tile:hover img { transform: scale(1.04); }
 .settings-form { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
 .settings-form label { display: grid; gap: 6px; color: var(--indigo); font-size: 13px; font-weight: 600; }
 .settings-form input,.settings-form textarea { width: 100%; padding: 11px 13px; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 12px; font: inherit; font-weight: 400; resize: vertical; }
+#username { scroll-margin-top: 45vh; } /* keeps the label and heading in view when linked to from the dashboard */
 .settings-form-wide { grid-column: 1 / -1; }
 .settings-optional,.settings-count { color: var(--muted); font-size: 12px; font-weight: 400; }
 .settings-count { justify-self: end; }
 .settings-form-actions { display: flex; align-items: center; gap: 14px; }
 .settings-form-actions .primary-btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: none; }
-.settings-status { font-size: 13px; font-weight: 600; }
+.settings-status { margin: 0; font-size: 13px; font-weight: 600; }
+p.settings-status:empty { display: none; }
+.settings-form.settings-password { padding: 2px 0 18px; }
+p.settings-status { padding-bottom: 12px; }
 .settings-status.saved { color: #2f7d55; }
 .settings-status.error { color: #b4413a; }
 .settings-fieldset { margin: 0 0 18px; padding: 0; border: 0; }
@@ -668,6 +689,7 @@ button.profile-tile:hover img { transform: scale(1.04); }
 /* Status and danger colors need more contrast on dark */
 :root[data-theme="dark"] .settings-status.saved { color: #7fd6a4; }
 :root[data-theme="dark"] .settings-status.error { color: #ff9b92; }
+:root[data-theme="dark"] .auth-message.error { color: #ffb3ab; background: rgba(229,100,90,.16); }
 :root[data-theme="dark"] .danger-outline-btn { color: #ff9b92; background: transparent; border-color: rgba(255,120,110,.35); }
 :root[data-theme="dark"] .danger-outline-btn:hover { background: rgba(255,120,110,.1); }
 

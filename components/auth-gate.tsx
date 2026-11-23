@@ -1,14 +1,15 @@
 "use client";
 import { useEffect, useRef, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "@/lib/session";
+import { reloadSession, signOut, useRecovering, useSession, useSessionFailed } from "@/lib/session";
 
-// Client-side gating for the simulated sign-in. On a static site this only controls what the
-// UI shows; once real accounts exist, private data must also be protected where it is served.
+// On a static site this only controls what the UI shows. What people can actually read or change
+// is enforced by Supabase's Row Level Security.
 
 /** Renders children for signed-in visitors. Guests go to /login and come back here afterwards. */
 export function RequireSession({ children }: { children: ReactNode }) {
   const session = useSession();
+  const failed = useSessionFailed();
   const router = useRouter();
   const wasSignedIn = useRef(false);
 
@@ -20,6 +21,11 @@ export function RequireSession({ children }: { children: ReactNode }) {
     router.replace(`/login?next=${encodeURIComponent(here)}`);
   }, [session, router]);
 
+  if (failed && !session) return <div className="auth-pending"><div role="alert">
+    <p>We couldn’t open your studio. Check your connection and try again.</p>
+    <button type="button" className="primary-btn" onClick={reloadSession}>Try again</button>{" "}
+    <button type="button" className="secondary-btn" onClick={signOut}>Log out</button>
+  </div></div>;
   if (!session) return <div className="auth-pending" role="status">Opening your studio…</div>;
   return <>{children}</>;
 }
@@ -27,7 +33,9 @@ export function RequireSession({ children }: { children: ReactNode }) {
 /** Sends signed-in visitors away from guest pages (landing, log in, sign up). */
 export function RedirectIfSignedIn({ to = "/home" }: { to?: string }) {
   const session = useSession();
+  const recovering = useRecovering();
   const router = useRouter();
-  useEffect(() => { if (session) router.replace(to); }, [session, router, to]);
+  // A reset link that lands elsewhere on the site still asks for the new password.
+  useEffect(() => { if (recovering) router.replace("/reset-password"); else if (session) router.replace(to); }, [session, recovering, router, to]);
   return null;
 }

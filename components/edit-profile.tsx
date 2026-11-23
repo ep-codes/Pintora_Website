@@ -1,9 +1,9 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { SettingsCard } from "@/components/settings-ui";
 import { courses } from "@/lib/courses";
-import { cleanUsername, skillLevels, updateAccount, USERNAME_MAX, useSession, type Account, type Preferences } from "@/lib/session";
+import { cleanUsername, skillLevels, updatePreferences, updateProfile, USERNAME_MAX, useSession, type Account, type Preferences } from "@/lib/session";
 
 const mediumOptions = courses["Mediums"].map((course) => course.name);
 
@@ -15,7 +15,8 @@ export default function EditProfile() {
 }
 
 function EditProfileContent({ account }: { account: Account }) {
-  const setPreferences = (changes: Partial<Preferences>) => updateAccount({ preferences: { ...account.preferences, ...changes } });
+  const [preferencesError, setPreferencesError] = useState<string | null>(null);
+  const setPreferences = async (changes: Partial<Preferences>) => setPreferencesError(await updatePreferences(changes));
   const toggleMedium = (medium: string) => setPreferences({
     mediums: account.preferences.mediums.includes(medium) ? account.preferences.mediums.filter((m) => m !== medium) : [...account.preferences.mediums, medium],
   });
@@ -48,6 +49,7 @@ function EditProfileContent({ account }: { account: Account }) {
           </label>)}
         </div>
       </fieldset>
+      <p role="alert" className="settings-status error">{preferencesError}</p>
     </SettingsCard>
   </div>;
 }
@@ -57,13 +59,22 @@ function ProfileForm({ account }: { account: Account }) {
   const [username, setUsername] = useState(account.username);
   const [bio, setBio] = useState(account.bio);
   const [status, setStatus] = useState<{ kind: "saved" | "error"; text: string } | null>(null);
+  const [busy, setBusy] = useState(false);
   const changed = name.trim() !== account.name || username !== account.username || bio.trim() !== account.bio;
+  const usernameInput = useRef<HTMLInputElement>(null);
+
+  // "Choose username" on the dashboard opens this page ready to type a new one.
+  useEffect(() => { if (window.location.hash === "#username") usernameInput.current?.select(); }, []);
+
   const edit = (setter: (value: string) => void) => (value: string) => { setter(value); setStatus(null); };
 
-  function submit(event: FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
     const values = { name: name.trim(), username, bio: bio.trim() };
-    const error = updateAccount(values);
+    if (!values.name) { setStatus({ kind: "error", text: "Please enter a name." }); return; }
+    setBusy(true);
+    const error = await updateProfile(values);
+    setBusy(false);
     if (error) { setStatus({ kind: "error", text: error }); return; }
     setName(values.name); setBio(values.bio);
     setStatus({ kind: "saved", text: "Changes saved" });
@@ -72,13 +83,13 @@ function ProfileForm({ account }: { account: Account }) {
   return <SettingsCard title="Profile" description="How you appear around Pintora.">
     <form className="settings-form" onSubmit={submit}>
       <label>Display name<input value={name} onChange={(e) => edit(setName)(e.target.value)} maxLength={40} autoComplete="name" required /></label>
-      <label>Username<input value={username} onChange={(e) => edit(setUsername)(cleanUsername(e.target.value))} maxLength={USERNAME_MAX} autoCapitalize="none" spellCheck={false} required /></label>
+      <label>Username<input id="username" ref={usernameInput} value={username} onChange={(e) => edit(setUsername)(cleanUsername(e.target.value))} maxLength={USERNAME_MAX} autoCapitalize="none" spellCheck={false} required /></label>
       <label className="settings-form-wide"><span>Short bio <span className="settings-optional">(optional)</span></span>
         <textarea value={bio} onChange={(e) => edit(setBio)(e.target.value)} maxLength={160} rows={3} placeholder="What do you love to make?" />
         <span className="settings-count">{bio.length}/160</span>
       </label>
       <div className="settings-form-actions settings-form-wide">
-        <button className="primary-btn" type="submit" disabled={!changed}>Save changes</button>
+        <button className="primary-btn" type="submit" disabled={!changed || busy}>{busy ? "Saving…" : "Save changes"}</button>
         <span role="status" className={`settings-status ${status?.kind ?? ""}`}>{status?.text}</span>
       </div>
     </form>

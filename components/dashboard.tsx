@@ -7,7 +7,7 @@ import { lessonHref, lessons, type Lesson } from "@/lib/lessons";
 import { useProgress } from "@/lib/progress";
 import { useSavedLessons } from "@/lib/saved";
 import SymbolGlyph from "@/components/symbol-glyph";
-import { useSession } from "@/lib/session";
+import { updatePreferences, useSession, type Account } from "@/lib/session";
 
 const shortcuts: { href: string; icon: IconName; title: string; body: string }[] = [
   { href: "/discussions", icon: "discussion", title: "Join a discussion", body: "Ask a question or share what you're working on." },
@@ -37,6 +37,8 @@ export default function Dashboard() {
       <h1>Welcome back{firstName && <>, <em>{firstName}.</em></>}</h1>
       <p>Pick up where you left off, or try something new today.</p>
     </section>
+
+    {session?.automaticUsername && !session.preferences.keepUsername && <UsernameCard account={session} />}
 
     <div className="dashboard-stats" role="list" aria-label="Your progress">
       <div className="stat-tile" role="listitem"><strong>{completedCount}<small> / {lessons.length}</small></strong><span>Lessons finished</span></div>
@@ -75,6 +77,16 @@ export default function Dashboard() {
       </div>
     </section>
   </>;
+}
+
+function UsernameCard({ account }: { account: Account }) {
+  return <section className="username-card" aria-labelledby="username-card-heading">
+    <div><h2 id="username-card-heading">Make it yours.</h2><p>You’re <strong>@{account.username}</strong> right now. Pick a username you love.</p></div>
+    <div className="username-card-actions">
+      <button type="button" className="secondary-btn" onClick={() => updatePreferences({ keepUsername: true })}>Maybe later</button>
+      <Link className="primary-btn" href="/profile/edit#username">Choose username</Link>
+    </div>
+  </section>;
 }
 
 function ContinueCard({ lesson, step }: { lesson: Lesson; step: number | null }) {

@@ -24,6 +24,7 @@ export default function SiteNavigation() {
       <div className="nav-divider" />
       <Link href="/saved" className={isActive("/saved") ? "active" : ""}><Icon name="saved" />Saved</Link>
       <Link href="/profile" className={isActive("/profile") ? "active" : ""}><Icon name="profile" />Profile</Link>
+      <Link href="/settings" className={isActive("/settings") ? "active" : ""}><Icon name="settings" />Settings</Link>
       {/* RequireSession sends the visitor to the landing page once the session clears. */}
       <button type="button" className="nav-logout" onClick={signOut}><Icon name="logout" />Log out</button>
     </nav>

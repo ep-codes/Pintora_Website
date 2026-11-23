@@ -7,3 +7,6 @@ export const lessons = [
 ];
 
 export type Lesson = (typeof lessons)[number];
+
+/** Opens the lesson on the Learn page, where the learner left off. */
+export const lessonHref = (lesson: Lesson) => `/learn?lesson=${lesson.id}#lessons`;

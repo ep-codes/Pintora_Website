@@ -1,8 +1,8 @@
 import SiteShell from "@/components/site-shell";
-import ProfileSettings from "@/components/profile-settings";
+import ProfileView from "@/components/profile-view";
 
 export const metadata = { title: "Profile" };
 
 export default function ProfilePage() {
-  return <SiteShell><ProfileSettings /></SiteShell>;
+  return <SiteShell><ProfileView /></SiteShell>;
 }

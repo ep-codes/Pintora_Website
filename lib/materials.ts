@@ -5,6 +5,9 @@ export const materialTypes: MaterialType[] = ["Paint", "Drawing", "Markers", "Pa
 
 export type Material = { icon: string; name: string; type: MaterialType; intro: string; tip: string; color: "mint" | "sand" | "rose" };
 
+/** Anchor id of a material's card on /materials. */
+export const materialSlug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
 export const materials: Material[] = [
   // Paint
   { icon: "◒", name: "Watercolor", type: "Paint", color: "mint", intro: "A little pigment, a little water, a world of possibility.", tip: "Start with a small student-grade set of primary colors. A mixing palette and two jars of water are all you need." },

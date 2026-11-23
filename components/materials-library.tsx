@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { materials, materialTypes, type MaterialType } from "@/lib/materials";
+import { materials, materialSlug, materialTypes, type MaterialType } from "@/lib/materials";
 import SymbolGlyph from "@/components/symbol-glyph";
 
 type Filter = "All materials" | MaterialType;
@@ -15,7 +15,7 @@ export default function MaterialsLibrary() {
       {filters.map((f) => <button key={f} className={f === filter ? "selected" : ""} aria-pressed={f === filter} onClick={() => setFilter(f)}>{f}</button>)}
     </div>
     <div className="materials-grid">
-      {visible.map((m) => <article className="supply-card" key={m.name}>
+      {visible.map((m) => <article className="supply-card" id={materialSlug(m.name)} key={m.name}>
         <div className={`supply-visual ${m.color}`} aria-hidden="true"><SymbolGlyph value={m.icon} /></div>
         <div className="eyebrow">{m.type}</div>
         <h2>{m.name}</h2>

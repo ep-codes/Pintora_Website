@@ -10,22 +10,30 @@ export type SkillLevel = "Beginner" | "Intermediate" | "Advanced";
 export const skillLevels: SkillLevel[] = ["Beginner", "Intermediate", "Advanced"];
 
 export type Preferences = { mediums: string[]; level: SkillLevel; weeklyDigest: boolean; replyEmails: boolean };
-export type Account = { id: string; name: string; email: string; bio: string; joinedAt: number; preferences: Preferences };
+export type Account = { id: string; name: string; username: string; email: string; bio: string; joinedAt: number; preferences: Preferences };
 
 const ACCOUNTS_KEY = "pintora-accounts";
 const SESSION_KEY = "pintora-session";
 const defaultPreferences: Preferences = { mediums: [], level: "Beginner", weeklyDigest: true, replyEmails: true };
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
+
+export const USERNAME_MAX = 30;
+
+/** Lowercase letters, numbers, dots and underscores: the only characters a username may contain. */
+export const cleanUsername = (value: string) => value.normalize("NFKD").toLowerCase().replace(/[^a-z0-9._]/g, "").slice(0, USERNAME_MAX);
+const defaultUsername = (name: string) => cleanUsername(name) || "artist";
 const sameEmail = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
 
 function toAccount(id: string, value: unknown): Account | null {
   if (!isRecord(value)) return null;
-  const { name, email, bio, joinedAt, preferences } = value;
+  const { name, username, email, bio, joinedAt, preferences } = value;
   if (typeof name !== "string" || typeof email !== "string") return null;
   const prefs = isRecord(preferences) ? preferences : {};
   return {
     id, name, email,
+    // Accounts from before usernames existed get one based on their name.
+    username: (typeof username === "string" && cleanUsername(username)) || defaultUsername(name),
     bio: typeof bio === "string" ? bio : "",
     joinedAt: typeof joinedAt === "number" ? joinedAt : 0,
     preferences: {
@@ -65,12 +73,21 @@ export function useSession(): Account | null | undefined {
   }, [rawSession, rawAccounts]);
 }
 
+function availableUsername(name: string, accounts: Record<string, Account>) {
+  const taken = new Set(Object.values(accounts).map((a) => a.username));
+  const base = defaultUsername(name);
+  let username = base;
+  for (let n = 2; taken.has(username); n++) username = `${base.slice(0, USERNAME_MAX - String(n).length)}${n}`;
+  return username;
+}
+
 /** Signs in to the account with this email, creating it if this browser hasn't seen it. */
 export function signIn({ email, name }: { email: string; name?: string }) {
   const accounts = readAccounts();
   let account = Object.values(accounts).find((a) => sameEmail(a.email, email));
   if (!account) {
-    account = { id: crypto.randomUUID(), name: name?.trim() || email.split("@")[0], email: email.trim(), bio: "", joinedAt: Date.now(), preferences: { ...defaultPreferences } };
+    const displayName = name?.trim() || email.split("@")[0];
+    account = { id: crypto.randomUUID(), name: displayName, username: availableUsername(displayName, accounts), email: email.trim(), bio: "", joinedAt: Date.now(), preferences: { ...defaultPreferences } };
     accounts[account.id] = account;
     writeAccounts(accounts);
   }
@@ -82,12 +99,15 @@ export function signOut() {
 }
 
 /** Updates the signed-in account. Returns an error message, or null on success. */
-export function updateAccount(changes: Partial<Pick<Account, "name" | "email" | "bio" | "preferences">>): string | null {
+export function updateAccount(changes: Partial<Pick<Account, "name" | "username" | "email" | "bio" | "preferences">>): string | null {
   const accounts = readAccounts();
   const account = currentAccount(readStoredString(SESSION_KEY), accounts);
   if (!account) return "You're signed out. Log in again to save changes.";
   if (changes.email && Object.values(accounts).some((a) => a.id !== account.id && sameEmail(a.email, changes.email!))) {
     return "Another account on this browser already uses that email.";
+  }
+  if (changes.username && changes.username !== account.username && Object.values(accounts).some((a) => a.id !== account.id && a.username === changes.username)) {
+    return "That username is already taken on this browser.";
   }
   const updated = { ...account, ...changes };
   if (account.id === "legacy") {

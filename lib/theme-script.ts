@@ -5,7 +5,7 @@ import { STORAGE_CHANGE_EVENT } from "@/lib/storage-event";
 export const THEME_KEY = "pintora-theme";
 export const ACCENT_KEY = "pintora-accent";
 
-// Accent colors a user can pick in Profile → Appearance, one per color family in the pastel palette, plus a neutral grey.
+// Accent colors a user can pick in Settings → Appearance & Display, one per color family in the pastel palette, plus a neutral grey.
 // The first is the default. The colors themselves live in styles.css under [data-accent="…"].
 export const accents = ["purple", "orange", "pink", "blue", "green", "grey"] as const;
 

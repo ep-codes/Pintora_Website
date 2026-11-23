@@ -45,7 +45,7 @@ export default function LandingPage() {
     <section className="landing-section" aria-labelledby="community-heading">
       <div className="section-heading"><div><h2 id="community-heading">Made by our community</h2><p className="landing-lede">Different mediums, endless ways to see.</p></div></div>
       <div className="community-grid">
-        {works.slice(0, 4).map((work) => <article className="creation" key={work.title}>
+        {works.slice(0, 4).map((work) => <article className="creation" key={work.id}>
           <img src={`/art/${work.image}.svg`} alt={`${work.title}, a ${work.medium.toLowerCase()} study`} />
           <div className="creation-detail"><div><div className="eyebrow">{work.medium}</div><h3>{work.title}</h3><p>by {work.artist}</p></div></div>
         </article>)}

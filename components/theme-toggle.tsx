@@ -2,7 +2,7 @@
 import { Icon } from "@/components/icons";
 import { setThemePreference, useResolvedTheme } from "@/lib/theme";
 
-/** One-click switch between light and dark. "Follow the system" lives in Profile → Appearance. */
+/** One-click switch between light and dark. "Follow the system" lives in Settings → Appearance & Display. */
 export default function ThemeToggle() {
   const theme = useResolvedTheme();
   const next = theme === "dark" ? "light" : "dark";

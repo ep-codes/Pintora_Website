@@ -3,13 +3,11 @@ import Link from "next/link";
 import LessonBrowser from "@/components/lesson-browser";
 import { Icon, type IconName } from "@/components/icons";
 import { courseSlug, featuredMediums } from "@/lib/courses";
-import { lessons, type Lesson } from "@/lib/lessons";
+import { lessonHref, lessons, type Lesson } from "@/lib/lessons";
 import { useProgress } from "@/lib/progress";
 import { useSavedLessons } from "@/lib/saved";
 import SymbolGlyph from "@/components/symbol-glyph";
 import { useSession } from "@/lib/session";
-
-const lessonHref = (lesson: Lesson) => `/learn?lesson=${lesson.id}#lessons`;
 
 const shortcuts: { href: string; icon: IconName; title: string; body: string }[] = [
   { href: "/discussions", icon: "discussion", title: "Join a discussion", body: "Ask a question or share what you're working on." },

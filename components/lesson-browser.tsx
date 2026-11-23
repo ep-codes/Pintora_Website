@@ -82,7 +82,7 @@ function LessonBrowserContent({ compact, savedOnly }: Required<LessonBrowserProp
       </div>
       <div className="filter-row">
         <input aria-label="Filter lesson titles" placeholder="Search lessons…" value={query} onChange={(e) => setQuery(e.target.value)} />
-        {!savedOnly && <button className={onlySaved ? "save-filter selected" : "save-filter"} aria-pressed={onlySaved} onClick={() => setOnlySaved(!onlySaved)}><Icon name="saved" /> Saved lessons</button>}
+        {!savedOnly && <button className={onlySaved ? "save-filter selected" : "save-filter"} aria-pressed={onlySaved} onClick={() => setOnlySaved(!onlySaved)}><Icon name="saved" /> Bookmarks</button>}
         <span>{visible.length} lessons</span>
       </div>
     </div>
@@ -93,7 +93,7 @@ function LessonBrowserContent({ compact, savedOnly }: Required<LessonBrowserProp
         return <article className="lesson-card" key={l.id}>
           <div className="lesson-image">
             <button className="image-open" onClick={() => open(l)} aria-label={`Open ${l.title}`}><img src={`/art/${l.image}.svg`} alt={l.title} /><span className="lesson-duration">◷ {l.duration}</span><span className="play-icon">↗</span></button>
-            <button className={`bookmark ${isSaved ? "is-saved" : ""}`} aria-label={`${isSaved ? "Unsave" : "Save"} ${l.title}`} aria-pressed={isSaved} onClick={() => toggleSave(l.id)}><Icon name="saved" /></button>
+            <button className={`bookmark ${isSaved ? "is-saved" : ""}`} aria-label={`Bookmark ${l.title}`} aria-pressed={isSaved} onClick={() => toggleSave(l.id)}><Icon name="saved" /></button>
           </div>
           <div className="lesson-details">
             <div className="lesson-meta"><span>{l.category}</span><span>•</span><span>{l.level}</span></div>
@@ -106,7 +106,7 @@ function LessonBrowserContent({ compact, savedOnly }: Required<LessonBrowserProp
 
     {!visible.length && <div className="empty-state">
       <h3>A little room for discovery.</h3>
-      <p>{onlySaved ? "Save a lesson using its bookmark to collect it here." : "No lessons match yet. Try another medium or search."}</p>
+      <p>{onlySaved ? "Tap the bookmark on any lesson to collect it here." : "No lessons match yet. Try another medium or search."}</p>
       {savedOnly
         ? <Link className="secondary-btn" href="/learn#lessons">Browse all lessons →</Link>
         : <button className="secondary-btn" onClick={() => { setQuery(""); setCategory("All mediums"); setOnlySaved(false); }}>Browse all lessons →</button>}

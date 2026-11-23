@@ -41,7 +41,7 @@ export default function Dashboard() {
     <div className="dashboard-stats" role="list" aria-label="Your progress">
       <div className="stat-tile" role="listitem"><strong>{completedCount}<small> / {lessons.length}</small></strong><span>Lessons finished</span></div>
       <div className="stat-tile" role="listitem"><strong>{inProgress.length}</strong><span>In progress</span></div>
-      <div className="stat-tile" role="listitem"><strong>{saved.length}</strong><span>Saved for later</span></div>
+      <div className="stat-tile" role="listitem"><strong>{saved.length}</strong><span>Bookmarked</span></div>
     </div>
 
     <section className="home-section" aria-labelledby="continue-heading">
@@ -50,7 +50,7 @@ export default function Dashboard() {
     </section>
 
     <section className="home-section" aria-labelledby="saved-heading">
-      <div className="section-heading"><h2 className="subheading" id="saved-heading">Saved lessons</h2>{savedLessons.length > 0 && <Link className="view-all-link" href="/saved">View all</Link>}</div>
+      <div className="section-heading"><h2 className="subheading" id="saved-heading">Bookmarked lessons</h2>{savedLessons.length > 0 && <Link className="view-all-link" href="/saved">View all</Link>}</div>
       {savedLessons.length
         ? <div className="mini-lesson-list">{savedLessons.slice(0, 3).map((l) => <Link className="mini-lesson" href={lessonHref(l)} key={l.id}><img src={`/art/${l.image}.svg`} alt="" /><span><strong>{l.title}</strong><small>{l.category} · {l.duration}</small></span></Link>)}</div>
         : <p className="dashboard-empty">Tap the bookmark on any lesson to keep it here.</p>}

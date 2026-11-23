@@ -1,9 +1,10 @@
 "use client";
 import { useRef, useState, type KeyboardEvent } from "react";
 import Link from "next/link";
+import ArtworkDialog from "@/components/artwork-dialog";
 import { Icon, type IconName } from "@/components/icons";
-import { lessonHref, lessons } from "@/lib/lessons";
-import { useSavedLessons } from "@/lib/saved";
+import { useSavedWorks } from "@/lib/community";
+import { works, type Work } from "@/lib/gallery";
 import { useSession, type Account } from "@/lib/session";
 
 // Uploading artwork and following artists don't exist yet, so these are honestly zero.
@@ -104,28 +105,43 @@ function ProfileTabs() {
 }
 
 function ArtworksPanel() {
-  return <EmptyGrid title="Your artworks will hang here." body="Sharing your own work isn't available yet. Until then, a little practice goes a long way." action="Find a lesson" />;
+  return <EmptyGrid title="Your artworks will hang here." body="Sharing your own work isn't available yet. Until then, a little practice goes a long way." action="Find a lesson" href="/learn#lessons" />;
 }
 
+// Artworks saved in Community. (Bookmarked lessons have their own page, /saved.)
+// Own artworks will appear here too once they can be uploaded: anything in `works` can be saved.
 function SavedPanel() {
-  const saved = useSavedLessons() ?? [];
-  const savedLessons = lessons.filter((lesson) => saved.includes(lesson.id));
-  if (!savedLessons.length) return <EmptyGrid title="Nothing saved yet." body="Tap the bookmark on any lesson to keep it here." action="Browse lessons" />;
-  return <div className="profile-grid">
-    {savedLessons.map((lesson) => <Link className="profile-tile" href={lessonHref(lesson)} key={lesson.id}>
-      <img src={`/art/${lesson.image}.svg`} alt="" />
-      <span className="profile-tile-caption"><strong>{lesson.title}</strong><small>{lesson.category} · {lesson.duration}</small></span>
-    </Link>)}
-  </div>;
+  const saved = useSavedWorks() ?? [];
+  const savedWorks = saved.flatMap((id) => works.find((work) => work.id === id) ?? []).reverse();
+  // The list is fixed while the dialog is open, so un-saving inside it doesn't pull the artwork away.
+  const [browsing, setBrowsing] = useState<{ works: Work[]; id: string } | null>(null);
+
+  function close() {
+    // If the opened tile was un-saved, its focus has nowhere to return to.
+    if (!document.activeElement?.classList.contains("profile-tile")) document.getElementById("profile-tab-saved")?.focus({ preventScroll: true });
+    setBrowsing(null);
+  }
+
+  return <>
+    {savedWorks.length
+      ? <div className="profile-grid">
+        {savedWorks.map((work) => <button type="button" className="profile-tile" key={work.id} aria-haspopup="dialog" onClick={() => setBrowsing({ works: savedWorks, id: work.id })}>
+          <img src={`/art/${work.image}.svg`} alt="" />
+          <span className="profile-tile-caption"><strong>{work.title}</strong><small>by {work.artist}</small></span>
+        </button>)}
+      </div>
+      : <EmptyGrid title="No saved artworks yet." body="Save an artwork you love in Community and it will hang here." action="Browse Community" href="/community" />}
+    <ArtworkDialog works={browsing?.works ?? []} openId={browsing?.id ?? null} startAt="artwork" onSelect={(id) => setBrowsing((current) => current && { ...current, id })} onClose={close} />
+  </>;
 }
 
-function EmptyGrid({ title, body, action }: { title: string; body: string; action: string }) {
+function EmptyGrid({ title, body, action, href }: { title: string; body: string; action: string; href: string }) {
   return <div className="profile-empty">
     <div className="profile-grid" aria-hidden="true">{Array.from({ length: PLACEHOLDER_TILES }, (_, i) => <div className="profile-tile" key={i} />)}</div>
     <div className="profile-empty-note">
       <h3>{title}</h3>
       <p>{body}</p>
-      <Link className="secondary-btn" href="/learn#lessons">{action} →</Link>
+      <Link className="secondary-btn" href={href}>{action} →</Link>
     </div>
   </div>;
 }

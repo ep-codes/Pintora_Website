@@ -2,7 +2,7 @@
 import { useState } from "react";
 import ArtworkDialog from "@/components/artwork-dialog";
 import { Icon } from "@/components/icons";
-import { toggleLikedWork, useComments, useLikedWorks } from "@/lib/community";
+import { toggleLikedWork, toggleSavedWork, useComments, useLikedWorks, useSavedWorks } from "@/lib/community";
 import { works } from "@/lib/gallery";
 
 const mediums = ["All mediums", "Watercolor", "Drawing", "Acrylic", "Gouache"];
@@ -12,6 +12,7 @@ export default function CommunityGallery() {
   const [sort, setSort] = useState("Most recent");
   const [open, setOpen] = useState<{ id: string; at: "artwork" | "comments" } | null>(null);
   const liked = useLikedWorks() ?? [];
+  const saved = useSavedWorks() ?? [];
   const comments = useComments() ?? [];
   const visibleWorks = works
     .filter((work) => topic === "All mediums" || work.medium === topic)
@@ -27,6 +28,7 @@ export default function CommunityGallery() {
     </div>
     <div className="community-grid">{visibleWorks.map((work) => {
       const isLiked = liked.includes(work.id);
+      const isSaved = saved.includes(work.id);
       const commentCount = work.comments.length + comments.filter((comment) => comment.workId === work.id).length;
       const openArtwork = () => setOpen({ id: work.id, at: "artwork" });
       return <article className="creation creation-interactive" key={work.id}>
@@ -37,6 +39,7 @@ export default function CommunityGallery() {
         <div className="creation-actions">
           <button type="button" className={`creation-action${isLiked ? " liked" : ""}`} aria-label={`Appreciate ${work.title}`} aria-pressed={isLiked} onClick={() => toggleLikedWork(work.id)}><Icon name="heart" />{work.likes + (isLiked ? 1 : 0)}</button>
           <button type="button" className="creation-action" aria-label={`${commentCount} ${commentCount === 1 ? "comment" : "comments"} on ${work.title}`} aria-haspopup="dialog" onClick={() => setOpen({ id: work.id, at: "comments" })}><Icon name="discussion" />{commentCount}</button>
+          <button type="button" className={`creation-action creation-save${isSaved ? " saved" : ""}`} aria-label={`Save ${work.title}`} title={isSaved ? "Saved to your profile" : "Save to your profile"} aria-pressed={isSaved} onClick={() => toggleSavedWork(work.id)}><Icon name="saved" /></button>
         </div>
       </article>;
     })}</div>

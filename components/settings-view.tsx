@@ -44,9 +44,9 @@ function SettingsContent({ account }: { account: Account }) {
       <EmailForm account={account} key={account.id} />
       <div className="settings-row"><span className="settings-text"><strong>Password</strong><span>Password changes will be available once real accounts are connected.</span></span></div>
       <ConfirmAction label="Reset learning progress" description="Clears your finished and in-progress lessons from this browser." action="Reset" confirmLabel="Yes, reset progress" disabled={started === 0} onConfirm={clearProgress} />
-      <ConfirmAction label="Clear saved lessons" description="Removes every lesson from your Saved list in this browser." action="Clear" confirmLabel="Yes, clear saved" disabled={saved.length === 0} onConfirm={clearSavedLessons} />
+      <ConfirmAction label="Clear bookmarks" description="Removes every lesson from your Bookmarks in this browser." action="Clear" confirmLabel="Yes, clear bookmarks" disabled={saved.length === 0} onConfirm={clearSavedLessons} />
       <div className="settings-row"><span className="settings-text"><strong>Log out</strong><span>Log back in any time with the same email.</span></span><button type="button" className="secondary-btn" onClick={signOut}>Log out</button></div>
-      <ConfirmAction danger label="Delete account" description="Removes your profile, comments, progress and saved lessons from this browser. This can't be undone." action="Delete account" confirmLabel="Yes, delete my account" onConfirm={() => { clearProgress(); clearSavedLessons(); clearCommunityActivity(account.id); deleteAccount(); }} />
+      <ConfirmAction danger label="Delete account" description="Removes your profile, comments, progress, bookmarks and saved artworks from this browser. This can't be undone." action="Delete account" confirmLabel="Yes, delete my account" onConfirm={() => { clearProgress(); clearSavedLessons(); clearCommunityActivity(account.id); deleteAccount(); }} />
     </SettingsSection>
 
     <AppearanceSettings />

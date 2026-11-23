@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { parseJson, readStoredString, useStoredString, writeStoredString } from "@/lib/local-store";
 
-// Bookmarked lesson ids, kept in this browser.
+// Bookmarked lesson ids (the Bookmarks page), kept in this browser. Saved artworks are in lib/community.ts.
 const KEY = "pintora-saved";
 
 function toIds(value: unknown): string[] {

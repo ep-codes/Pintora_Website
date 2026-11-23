@@ -2,10 +2,11 @@ import { useMemo } from "react";
 import { parseJson, readStoredString, useStoredString, writeStoredString } from "@/lib/local-store";
 import type { Account } from "@/lib/session";
 
-// Likes and comments on community artwork, kept in this browser. Nothing is sent to a server.
+// Likes, saves and comments on community artwork, kept in this browser. Nothing is sent to a server.
 export type Comment = { id: string; workId: string; authorId: string; name: string; username: string; text: string; createdAt: number };
 
 const LIKES_KEY = "pintora-likes";
+const SAVED_KEY = "pintora-saved-works";
 const COMMENTS_KEY = "pintora-comments";
 export const COMMENT_MAX = 300;
 
@@ -24,16 +25,23 @@ function toComments(value: unknown): Comment[] {
 const readComments = () => toComments(parseJson(readStoredString(COMMENTS_KEY)));
 const writeComments = (comments: Comment[]) => writeStoredString(COMMENTS_KEY, JSON.stringify(comments));
 
-/** Ids of liked works; `undefined` until the browser value is known. */
-export function useLikedWorks(): string[] | undefined {
-  const raw = useStoredString(LIKES_KEY);
+function useIds(key: string): string[] | undefined {
+  const raw = useStoredString(key);
   return useMemo(() => (raw === undefined ? undefined : toIds(parseJson(raw))), [raw]);
 }
 
-export function toggleLikedWork(id: string) {
-  const ids = toIds(parseJson(readStoredString(LIKES_KEY)));
-  writeStoredString(LIKES_KEY, JSON.stringify(ids.includes(id) ? ids.filter((v) => v !== id) : [...ids, id]));
+function toggleId(key: string, id: string) {
+  const ids = toIds(parseJson(readStoredString(key)));
+  writeStoredString(key, JSON.stringify(ids.includes(id) ? ids.filter((v) => v !== id) : [...ids, id]));
 }
+
+/** Ids of liked works; `undefined` until the browser value is known. */
+export const useLikedWorks = () => useIds(LIKES_KEY);
+export const toggleLikedWork = (id: string) => toggleId(LIKES_KEY, id);
+
+/** Ids of artworks kept in the profile's Saved tab, oldest first; `undefined` until known. (Bookmarked lessons are in lib/saved.ts.) */
+export const useSavedWorks = () => useIds(SAVED_KEY);
+export const toggleSavedWork = (id: string) => toggleId(SAVED_KEY, id);
 
 /** Comments written in this browser, newest first; `undefined` until known. */
 export function useComments(): Comment[] | undefined {
@@ -52,5 +60,6 @@ export function deleteComment(id: string) {
 /** Used when an account is deleted. */
 export function clearCommunityActivity(authorId: string) {
   writeStoredString(LIKES_KEY, null);
+  writeStoredString(SAVED_KEY, null);
   writeComments(readComments().filter((comment) => comment.authorId !== authorId));
 }

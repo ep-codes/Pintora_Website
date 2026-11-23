@@ -3,7 +3,7 @@ import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent 
 import Link from "next/link";
 import { Icon } from "@/components/icons";
 import SymbolGlyph from "@/components/symbol-glyph";
-import { addComment, COMMENT_MAX, deleteComment, toggleLikedWork, useComments, useLikedWorks } from "@/lib/community";
+import { addComment, COMMENT_MAX, deleteComment, toggleLikedWork, toggleSavedWork, useComments, useLikedWorks, useSavedWorks } from "@/lib/community";
 import type { Work } from "@/lib/gallery";
 import { materials, materialSlug } from "@/lib/materials";
 import { useSession } from "@/lib/session";
@@ -64,6 +64,7 @@ export default function ArtworkDialog({ works, openId, startAt, onSelect, onClos
 
 function ArtworkInfo({ work, headingId }: { work: Work; headingId: string }) {
   const isLiked = (useLikedWorks() ?? []).includes(work.id);
+  const isSaved = (useSavedWorks() ?? []).includes(work.id);
   return <div className="art-info">
     <div className="eyebrow">{work.medium}</div>
     <h2 id={headingId}>{work.title}</h2>
@@ -79,9 +80,14 @@ function ArtworkInfo({ work, headingId }: { work: Work; headingId: string }) {
         </li>;
       })}
     </ul>
-    <button type="button" className={`creation-action art-like${isLiked ? " liked" : ""}`} aria-label={`Appreciate ${work.title}, ${work.likes + (isLiked ? 1 : 0)} so far`} aria-pressed={isLiked} onClick={() => toggleLikedWork(work.id)}>
-      <Icon name="heart" />{isLiked ? "Appreciated" : "Appreciate"} · {work.likes + (isLiked ? 1 : 0)}
-    </button>
+    <div className="art-actions">
+      <button type="button" className={`creation-action art-action${isLiked ? " liked" : ""}`} aria-label={`Appreciate ${work.title}, ${work.likes + (isLiked ? 1 : 0)} so far`} aria-pressed={isLiked} onClick={() => toggleLikedWork(work.id)}>
+        <Icon name="heart" />{isLiked ? "Appreciated" : "Appreciate"} · {work.likes + (isLiked ? 1 : 0)}
+      </button>
+      <button type="button" className={`creation-action art-action${isSaved ? " saved" : ""}`} aria-label={`Save ${work.title}`} title={isSaved ? "Saved to your profile" : "Save to your profile"} aria-pressed={isSaved} onClick={() => toggleSavedWork(work.id)}>
+        <Icon name="saved" />{isSaved ? "Saved" : "Save"}
+      </button>
+    </div>
   </div>;
 }
 

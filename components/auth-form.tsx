@@ -9,7 +9,7 @@ type Mode = "login" | "signup";
 
 const copy = {
   login: { title: "Welcome back", lede: "Log in to pick up where you left off.", submit: "Log in", switchText: "New to Pintora?", switchLink: "Create a free account", switchHref: "/signup" },
-  signup: { title: "Join Pintora", lede: "Create a free account to unlock every course, save lessons, track your progress, and share your work.", submit: "Create account", switchText: "Already have an account?", switchLink: "Log in", switchHref: "/login" },
+  signup: { title: "Join Pintora", lede: "Create a free account to unlock every course, bookmark lessons, track your progress, and share your work.", submit: "Create account", switchText: "Already have an account?", switchLink: "Log in", switchHref: "/login" },
 };
 
 export default function AuthForm({ mode }: { mode: Mode }) {

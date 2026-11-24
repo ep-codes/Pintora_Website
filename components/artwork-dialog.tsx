@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import Link from "next/link";
+import Avatar from "@/components/avatar";
 import { Icon } from "@/components/icons";
 import SymbolGlyph from "@/components/symbol-glyph";
 import { addComment, COMMENT_MAX, deleteComment, loadComments, toggleLikedWork, toggleSavedWork, useComments, useLikedWorks, useSavedWorks, useWorkStats } from "@/lib/community";
@@ -69,7 +70,7 @@ function ArtworkInfo({ work, headingId }: { work: Work; headingId: string }) {
   return <div className="art-info">
     <div className="eyebrow">{work.medium}</div>
     <h2 id={headingId}>{work.title}</h2>
-    <div className="art-artist"><Initial name={work.artist} /><span><strong>{work.artist}</strong><small>@{work.username}</small></span></div>
+    <div className="art-artist"><Avatar className="art-initial" name={work.artist} /><span><strong>{work.artist}</strong><small>@{work.username}</small></span></div>
     <p className="art-caption">{work.caption}</p>
     <h3>Materials</h3>
     <ul className="art-materials">
@@ -113,7 +114,7 @@ function Comments({ work }: { work: Work }) {
   return <section className="art-comments" aria-labelledby={headingId}>
     <h3 id={headingId}>Comments <span>{comments.length + work.comments.length}</span></h3>
     {account && <form className="art-comment-form" onSubmit={submit}>
-      <Initial name={account.name} />
+      <Avatar className="art-initial" name={account.name} path={account.avatarPath} />
       <div>
         <textarea aria-label={`Comment on ${work.title}`} placeholder="Share a kind word or ask a question…" rows={2} maxLength={COMMENT_MAX} value={text} onChange={(e) => setText(e.target.value)} required />
         <div className="art-comment-actions">
@@ -128,7 +129,7 @@ function Comments({ work }: { work: Work }) {
         const mine = comment.author.id === account?.id;
         const author = mine ? account : comment.author;
         return <li key={comment.id}>
-          <Initial name={author.name} />
+          <Avatar className="art-initial" name={author.name} path={author.avatarPath} />
           <div>
             <div className="art-comment-meta"><strong>{author.name}</strong><span>@{author.username}</span><span>{timeAgo(comment.createdAt)}</span>
               {mine && <button type="button" className="art-comment-delete" onClick={() => deleteComment(work.id, comment.id)} aria-label={`Delete your comment: ${comment.text}`}>Delete</button>}
@@ -138,15 +139,11 @@ function Comments({ work }: { work: Work }) {
         </li>;
       })}
       {work.comments.map((comment) => <li key={comment.text}>
-        <Initial name={comment.name} />
+        <Avatar className="art-initial" name={comment.name} />
         <div><div className="art-comment-meta"><strong>{comment.name}</strong><span>@{comment.username}</span><span>{comment.when}</span></div><p>{comment.text}</p></div>
       </li>)}
     </ul>
   </section>;
-}
-
-function Initial({ name }: { name: string }) {
-  return <span className="art-initial" aria-hidden="true">{name.trim().charAt(0).toUpperCase() || "·"}</span>;
 }
 
 function timeAgo(time: number) {

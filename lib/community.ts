@@ -63,16 +63,16 @@ export function useWorkStats() {
 
 // ---- Comments ----
 
-export type Comment = { id: string; text: string; createdAt: number; author: { id: string; name: string; username: string } };
+export type Comment = { id: string; text: string; createdAt: number; author: { id: string; name: string; username: string; avatarPath: string | null } };
 type CommentList = { comments: Comment[]; failed: boolean };
-type CommentRow = { id: string; body: string; created_at: string; author: Comment["author"] };
+type CommentRow = { id: string; body: string; created_at: string; author: { id: string; name: string; username: string; avatar_path?: string | null } };
 
-const COMMENT_COLUMNS = "id, body, created_at, author:profiles(id, name, username)";
+const COMMENT_COLUMNS = "id, body, created_at, author:profiles(*)";
 const COMMENTS_SHOWN = 200;
 let commentLists: Record<string, CommentList> = {};
 const commentListeners = new Set<() => void>();
 
-const toComment = (row: CommentRow): Comment => ({ id: row.id, text: row.body, createdAt: Date.parse(row.created_at), author: row.author });
+const toComment = (row: CommentRow): Comment => ({ id: row.id, text: row.body, createdAt: Date.parse(row.created_at), author: { id: row.author.id, name: row.author.name, username: row.author.username, avatarPath: row.author.avatar_path ?? null } });
 
 function setComments(workId: string, list: CommentList) {
   commentLists = { ...commentLists, [workId]: list };

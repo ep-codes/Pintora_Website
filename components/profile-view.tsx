@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState, type KeyboardEvent } from "react";
 import Link from "next/link";
+import Avatar from "@/components/avatar";
 import ArtworkDialog from "@/components/artwork-dialog";
 import { Icon, type IconName } from "@/components/icons";
 import { useSavedWorks } from "@/lib/community";
@@ -34,7 +35,7 @@ function ProfileContent({ account }: { account: Account }) {
     <h1 className="profile-title">Profile</h1>
 
     <section className="profile-hero" aria-label="Your profile">
-      <div className="profile-avatar" aria-hidden="true">{account.name.trim().charAt(0).toUpperCase() || "·"}</div>
+      <Link className="profile-avatar-link" href="/profile/edit" aria-label="Change profile picture" title="Change profile picture"><Avatar className="profile-avatar" name={account.name} path={account.avatarPath} /><span className="profile-avatar-badge" aria-hidden="true"><Icon name="camera" /></span></Link>
       <div className="profile-identity">
         <h2>{account.name}</h2>
         <p>@{account.username}</p>

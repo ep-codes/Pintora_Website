@@ -1,6 +1,7 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import Avatar from "@/components/avatar";
 import { ConfirmAction, SettingsSection, Toggle } from "@/components/settings-ui";
 import { lessons } from "@/lib/lessons";
 import { clearProgress, useProgress } from "@/lib/progress";
@@ -39,7 +40,7 @@ function SettingsContent({ account }: { account: Account }) {
     <h1 className="profile-title">Settings</h1>
 
     <div className="settings-identity">
-      <div className="profile-avatar" aria-hidden="true">{account.name.trim().charAt(0).toUpperCase() || "·"}</div>
+      <Avatar className="profile-avatar" name={account.name} path={account.avatarPath} />
       <div className="profile-identity"><strong>{account.name}</strong><p>@{account.username}</p></div>
       <Link className="profile-btn" href="/profile/edit">Edit Profile</Link>
     </div>

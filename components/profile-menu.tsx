@@ -2,10 +2,9 @@
 import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Avatar, { AvatarContent } from "@/components/avatar";
 import { Icon, type IconName } from "@/components/icons";
 import { signOut, useSession, type Account } from "@/lib/session";
-
-const initialOf = (account: Account) => account.name.trim().charAt(0).toUpperCase() || "·";
 
 const links: { href: string; label: string; icon: IconName }[] = [
   { href: "/profile", label: "Profile", icon: "profile" },
@@ -43,7 +42,7 @@ function Menu({ account }: { account: Account }) {
   }, [open]);
 
   return <div className="profile-menu" ref={root}>
-    <button type="button" className={links.some((link) => isOn(pathname, link.href)) ? "avatar active" : "avatar"} ref={button} aria-expanded={open} aria-controls={open ? panelId : undefined} aria-label={`Your account (${account.name})`} title="Your account" onClick={() => setOpen(!open)}>{initialOf(account)}</button>
+    <button type="button" className={links.some((link) => isOn(pathname, link.href)) ? "avatar active" : "avatar"} ref={button} aria-expanded={open} aria-controls={open ? panelId : undefined} aria-label={`Your account (${account.name})`} title="Your account" onClick={() => setOpen(!open)}><AvatarContent name={account.name} path={account.avatarPath} /></button>
     {open && <div className="profile-menu-panel" id={panelId} role="group" aria-label="Your account"><Panel account={account} close={() => setOpen(false)} /></div>}
   </div>;
 }
@@ -52,7 +51,7 @@ function Panel({ account, close }: { account: Account; close: () => void }) {
   const pathname = usePathname();
   return <>
     <div className="profile-menu-head">
-      <span className="avatar" aria-hidden="true">{initialOf(account)}</span>
+      <Avatar className="avatar" name={account.name} path={account.avatarPath} />
       <span className="profile-menu-name"><strong>{account.name}</strong><small>@{account.username}</small></span>
     </div>
 

@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import Link from "next/link";
+import Avatar from "@/components/avatar";
 import { SettingsCard } from "@/components/settings-ui";
 import { courses } from "@/lib/courses";
-import { cleanUsername, skillLevels, updatePreferences, updateProfile, USERNAME_MAX, useSession, type Account, type Preferences } from "@/lib/session";
+import { changeAvatar, cleanUsername, removeAvatar, skillLevels, updatePreferences, updateProfile, USERNAME_MAX, useSession, type Account, type Preferences } from "@/lib/session";
 
 const mediumOptions = courses["Mediums"].map((course) => course.name);
 
@@ -27,6 +28,8 @@ function EditProfileContent({ account }: { account: Account }) {
       <h1>Edit Profile</h1>
       <p>For your email, theme and notifications, go to <Link href="/settings">Settings</Link>.</p>
     </header>
+
+    <PictureCard account={account} />
 
     {/* key resets the form if another tab switches accounts */}
     <ProfileForm account={account} key={account.id} />
@@ -52,6 +55,37 @@ function EditProfileContent({ account }: { account: Account }) {
       <p role="alert" className="settings-status error">{preferencesError}</p>
     </SettingsCard>
   </div>;
+}
+
+function PictureCard({ account }: { account: Account }) {
+  const input = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState<{ kind: "saved" | "error"; text: string } | null>(null);
+
+  async function run(action: () => Promise<string | null>, done: string) {
+    setBusy(true); setStatus(null);
+    const error = await action();
+    setStatus(error ? { kind: "error", text: error } : { kind: "saved", text: done });
+    setBusy(false);
+  }
+
+  function choose(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = ""; // so the same file can be picked again
+    if (file) void run(() => changeAvatar(file), "Picture saved");
+  }
+
+  return <SettingsCard title="Profile picture" description="We use the middle of your picture. Anyone can see it.">
+    <div className="picture-row">
+      <Avatar className="profile-avatar" name={account.name} path={account.avatarPath} />
+      <div className="picture-actions">
+        <input ref={input} type="file" accept="image/*" onChange={choose} hidden />
+        <button type="button" className="primary-btn" disabled={busy} onClick={() => input.current?.click()}>{busy ? "Saving…" : account.avatarPath ? "Change picture" : "Upload picture"}</button>
+        {account.avatarPath && <button type="button" className="secondary-btn" disabled={busy} onClick={() => run(removeAvatar, "Picture removed")}>Remove</button>}
+        <span role="status" className={`settings-status ${status?.kind ?? ""}`}>{status?.text}</span>
+      </div>
+    </div>
+  </SettingsCard>;
 }
 
 function ProfileForm({ account }: { account: Account }) {

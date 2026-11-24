@@ -1,8 +1,9 @@
 import { useSyncExternalStore } from "react";
 import type { User } from "@supabase/supabase-js";
+import { AVATAR_BUCKET, prepareAvatar } from "@/lib/avatar";
 import { supabase } from "@/lib/supabase";
 
-// Accounts, on Supabase Auth. Name, username and bio are in the public.profiles table (see supabase/migrations),
+// Accounts, on Supabase Auth. Name, username, bio and picture are in the public.profiles table (see supabase/migrations),
 // which signed-in people can read. Email and preferences stay with the private auth user.
 
 export type SkillLevel = "Beginner" | "Intermediate" | "Advanced";
@@ -13,6 +14,8 @@ export type Account = {
   id: string; name: string; username: string;
   /** Still the username made from their name at sign-up. */
   automaticUsername: boolean;
+  /** Where the profile picture is stored; see components/avatar.tsx. */
+  avatarPath: string | null;
   email: string; bio: string; joinedAt: number; preferences: Preferences;
 };
 
@@ -63,8 +66,7 @@ function setRecovering(recovering: boolean) {
   setState({ recovering });
 }
 
-type Profile = { username: string; name: string; bio: string; created_at: string };
-const PROFILE_COLUMNS = "username, name, bio, created_at";
+type Profile = { username: string; name: string; bio: string; avatar_path?: string | null; created_at: string };
 
 function toPreferences(value: unknown): Preferences {
   const prefs = (typeof value === "object" && value !== null ? value : {}) as Record<string, unknown>;
@@ -86,6 +88,7 @@ function isAutomaticUsername(user: Pick<User, "id" | "user_metadata">, username:
 
 const toAccount = (user: User, profile: Profile): Account => ({
   id: user.id, email: user.email ?? "", name: profile.name, username: profile.username, bio: profile.bio,
+  avatarPath: profile.avatar_path ?? null,
   automaticUsername: isAutomaticUsername(user, profile.username),
   joinedAt: Date.parse(profile.created_at),
   preferences: unsavedPreferences ?? toPreferences(user.user_metadata.preferences),
@@ -112,7 +115,7 @@ async function load(user: User | null) {
   }
   if (!user) { setState({ account: null, failed: false }); return; }
   if (state.account?.id !== user.id) setState({ account: undefined, failed: false });
-  const { data, error } = await supabase.from("profiles").select(PROFILE_COLUMNS).eq("id", user.id).single<Profile>();
+  const { data, error } = await supabase.from("profiles").select("*").eq("id", user.id).single<Profile>();
   if (thisLoad !== latestLoad) return; // something newer happened meanwhile
   if (!error) setState({ account: toAccount(user, data), failed: false });
   else if (!state.account) setState({ failed: true }); // a failed refresh keeps what's already showing
@@ -221,7 +224,7 @@ export async function changeEmail(email: string): Promise<string | null> {
 export async function updateProfile(changes: Pick<Account, "name" | "username" | "bio">): Promise<string | null> {
   const { account } = state;
   if (!account) return SIGNED_OUT;
-  const { data, error } = await supabase.from("profiles").update(changes).eq("id", account.id).select(PROFILE_COLUMNS).single<Profile>();
+  const { data, error } = await supabase.from("profiles").update(changes).eq("id", account.id).select("*").single<Profile>();
   if (error) return errorMessage(error);
   latestLoad++; // a load that started before this save would bring the old values back
   if (state.account?.id === account.id) setState({ account: {
@@ -229,6 +232,37 @@ export async function updateProfile(changes: Pick<Account, "name" | "username" |
     automaticUsername: state.account.automaticUsername && data.username === account.username,
   } });
   return null;
+}
+
+const PICTURES_NOT_SET_UP = "Profile pictures aren’t set up yet.";
+
+async function saveAvatarPath(account: Account, path: string | null): Promise<string | null> {
+  const { error } = await supabase.from("profiles").update({ avatar_path: path }).eq("id", account.id).select("id").single();
+  if (error) return error.code === "PGRST204" ? PICTURES_NOT_SET_UP : errorMessage(error);
+  latestLoad++;
+  if (state.account?.id === account.id) setState({ account: { ...state.account, avatarPath: path } });
+  // The old picture isn't used any more. If this fails, it goes when the account is deleted.
+  if (account.avatarPath) void supabase.storage.from(AVATAR_BUCKET).remove([account.avatarPath]);
+  return null;
+}
+
+export async function changeAvatar(file: File): Promise<string | null> {
+  const { account } = state;
+  if (!account) return SIGNED_OUT;
+  let picture: Blob;
+  try { picture = await prepareAvatar(file); } catch (error) { return (error as Error).message; }
+  const bucket = supabase.storage.from(AVATAR_BUCKET);
+  // A new name each time, so browsers never show an old picture they remember.
+  const path = `${account.id}/${crypto.randomUUID()}.jpg`;
+  const { error } = await bucket.upload(path, picture, { contentType: "image/jpeg", cacheControl: "31536000" });
+  if (error) return /bucket not found/i.test(error.message) ? PICTURES_NOT_SET_UP : errorMessage(error);
+  const problem = await saveAvatarPath(account, path);
+  if (problem) void bucket.remove([path]);
+  return problem;
+}
+
+export function removeAvatar(): Promise<string | null> {
+  return state.account ? saveAvatarPath(state.account, null) : Promise.resolve(SIGNED_OUT);
 }
 
 let preferencesQueue: Promise<unknown> = Promise.resolve();
@@ -255,6 +289,16 @@ export function updatePreferences(changes: Partial<Preferences>): Promise<string
 
 /** Permanently deletes the signed-in account and signs out. */
 export async function deleteAccount(): Promise<string | null> {
+  const { account } = state;
+  if (!account) return SIGNED_OUT;
+  // Pictures have to go first: Supabase doesn't delete accounts that still own files.
+  const bucket = supabase.storage.from(AVATAR_BUCKET);
+  const pictures = await bucket.list(account.id);
+  if (pictures.error && !/bucket not found/i.test(pictures.error.message)) return errorMessage(pictures.error);
+  if (pictures.data?.length) {
+    const removed = await bucket.remove(pictures.data.map((picture) => `${account.id}/${picture.name}`));
+    if (removed.error) return errorMessage(removed.error);
+  }
   const { error } = await supabase.rpc("delete_account");
   if (error) return errorMessage(error);
   signOut();

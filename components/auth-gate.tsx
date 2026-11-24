@@ -2,14 +2,18 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { reloadSession, signOut, useRecovering, useSession, useSessionFailed } from "@/lib/session";
+import { loadUserData, useUserData, useUserDataFailed } from "@/lib/user-data";
 
 // On a static site this only controls what the UI shows. What people can actually read or change
 // is enforced by Supabase's Row Level Security.
 
-/** Renders children for signed-in visitors. Guests go to /login and come back here afterwards. */
+/** Renders children for signed-in visitors, once their data is here. Guests go to /login and come back afterwards. */
 export function RequireSession({ children }: { children: ReactNode }) {
   const session = useSession();
-  const failed = useSessionFailed();
+  const sessionFailed = useSessionFailed();
+  const dataFailed = useUserDataFailed();
+  const hasData = useUserData(() => true);
+  const ready = session && hasData;
   const router = useRouter();
   const wasSignedIn = useRef(false);
 
@@ -21,12 +25,12 @@ export function RequireSession({ children }: { children: ReactNode }) {
     router.replace(`/login?next=${encodeURIComponent(here)}`);
   }, [session, router]);
 
-  if (failed && !session) return <div className="auth-pending"><div role="alert">
+  if ((sessionFailed || dataFailed) && !ready) return <div className="auth-pending"><div role="alert">
     <p>We couldn’t open your studio. Check your connection and try again.</p>
-    <button type="button" className="primary-btn" onClick={reloadSession}>Try again</button>{" "}
+    <button type="button" className="primary-btn" onClick={() => { void reloadSession(); void loadUserData(); }}>Try again</button>{" "}
     <button type="button" className="secondary-btn" onClick={signOut}>Log out</button>
   </div></div>;
-  if (!session) return <div className="auth-pending" role="status">Opening your studio…</div>;
+  if (!ready) return <div className="auth-pending" role="status">Opening your studio…</div>;
   return <>{children}</>;
 }
 

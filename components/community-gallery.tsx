@@ -2,8 +2,8 @@
 import { useState } from "react";
 import ArtworkDialog from "@/components/artwork-dialog";
 import { Icon } from "@/components/icons";
-import { toggleLikedWork, toggleSavedWork, useComments, useLikedWorks, useSavedWorks } from "@/lib/community";
-import { works } from "@/lib/gallery";
+import { toggleLikedWork, toggleSavedWork, useLikedWorks, useSavedWorks, useWorkStats } from "@/lib/community";
+import { works, type Work } from "@/lib/gallery";
 
 const mediums = ["All mediums", "Watercolor", "Drawing", "Acrylic", "Gouache"];
 
@@ -13,10 +13,12 @@ export default function CommunityGallery() {
   const [open, setOpen] = useState<{ id: string; at: "artwork" | "comments" } | null>(null);
   const liked = useLikedWorks() ?? [];
   const saved = useSavedWorks() ?? [];
-  const comments = useComments() ?? [];
+  const stats = useWorkStats() ?? {};
+  // Your own like doesn't count for sorting, so artworks don't jump around when you click.
+  const likesFromOthers = (work: Work) => work.likes + (stats[work.id]?.likes ?? 0) - (stats[work.id] && liked.includes(work.id) ? 1 : 0);
   const visibleWorks = works
     .filter((work) => topic === "All mediums" || work.medium === topic)
-    .sort((a, b) => sort === "Most liked" ? b.likes - a.likes : works.indexOf(b) - works.indexOf(a));
+    .sort((a, b) => sort === "Most liked" ? likesFromOthers(b) - likesFromOthers(a) : works.indexOf(b) - works.indexOf(a));
 
   return <>
     <div className="community-toolbar">
@@ -29,7 +31,7 @@ export default function CommunityGallery() {
     <div className="community-grid">{visibleWorks.map((work) => {
       const isLiked = liked.includes(work.id);
       const isSaved = saved.includes(work.id);
-      const commentCount = work.comments.length + comments.filter((comment) => comment.workId === work.id).length;
+      const commentCount = work.comments.length + (stats[work.id]?.comments ?? 0);
       const openArtwork = () => setOpen({ id: work.id, at: "artwork" });
       return <article className="creation creation-interactive" key={work.id}>
         <button type="button" className="creation-open" onClick={openArtwork} aria-label={`View ${work.title}`} aria-haspopup="dialog">
@@ -37,7 +39,7 @@ export default function CommunityGallery() {
         </button>
         <div className="creation-detail"><div><div className="eyebrow">{work.medium}</div><h2><button type="button" className="creation-title" onClick={openArtwork}>{work.title}</button></h2><p>by {work.artist}</p></div></div>
         <div className="creation-actions">
-          <button type="button" className={`creation-action${isLiked ? " liked" : ""}`} aria-label={`Appreciate ${work.title}`} aria-pressed={isLiked} onClick={() => toggleLikedWork(work.id)}><Icon name="heart" />{work.likes + (isLiked ? 1 : 0)}</button>
+          <button type="button" className={`creation-action${isLiked ? " liked" : ""}`} aria-label={`Appreciate ${work.title}`} aria-pressed={isLiked} onClick={() => toggleLikedWork(work.id)}><Icon name="heart" />{work.likes + (stats[work.id]?.likes ?? (isLiked ? 1 : 0))}</button>
           <button type="button" className="creation-action" aria-label={`${commentCount} ${commentCount === 1 ? "comment" : "comments"} on ${work.title}`} aria-haspopup="dialog" onClick={() => setOpen({ id: work.id, at: "comments" })}><Icon name="discussion" />{commentCount}</button>
           <button type="button" className={`creation-action creation-save${isSaved ? " saved" : ""}`} aria-label={`Save ${work.title}`} title={isSaved ? "Saved to your profile" : "Save to your profile"} aria-pressed={isSaved} onClick={() => toggleSavedWork(work.id)}><Icon name="saved" /></button>
         </div>

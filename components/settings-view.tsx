@@ -2,7 +2,6 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ConfirmAction, SettingsSection, Toggle } from "@/components/settings-ui";
-import { clearCommunityActivity } from "@/lib/community";
 import { lessons } from "@/lib/lessons";
 import { clearProgress, useProgress } from "@/lib/progress";
 import { clearSavedLessons, useSavedLessons } from "@/lib/saved";
@@ -33,10 +32,7 @@ function SettingsContent({ account }: { account: Account }) {
   const setPreferences = async (changes: Partial<Preferences>) => setPreferencesError(await updatePreferences(changes));
 
   async function removeAccount() {
-    const error = await deleteAccount();
-    setDeleteError(error);
-    if (error) return;
-    clearProgress(); clearSavedLessons(); clearCommunityActivity(account.id);
+    setDeleteError(await deleteAccount());
   }
 
   return <div className="settings-page">
@@ -52,10 +48,10 @@ function SettingsContent({ account }: { account: Account }) {
       {/* key resets the form if another tab switches accounts */}
       <EmailForm account={account} key={account.id} />
       <PasswordForm />
-      <ConfirmAction label="Reset learning progress" description="Clears your finished and in-progress lessons from this browser." action="Reset" confirmLabel="Yes, reset progress" disabled={started === 0} onConfirm={clearProgress} />
-      <ConfirmAction label="Clear bookmarks" description="Removes every lesson from your Bookmarks in this browser." action="Clear" confirmLabel="Yes, clear bookmarks" disabled={saved.length === 0} onConfirm={clearSavedLessons} />
+      <ConfirmAction label="Reset learning progress" description="Clears your finished and in-progress lessons." action="Reset" confirmLabel="Yes, reset progress" disabled={started === 0} onConfirm={clearProgress} />
+      <ConfirmAction label="Clear bookmarks" description="Removes every lesson from your Bookmarks." action="Clear" confirmLabel="Yes, clear bookmarks" disabled={saved.length === 0} onConfirm={clearSavedLessons} />
       <div className="settings-row"><span className="settings-text"><strong>Log out</strong><span>Log back in any time with your email and password.</span></span><button type="button" className="secondary-btn" onClick={signOut}>Log out</button></div>
-      <ConfirmAction danger label="Delete account" description="Permanently deletes your account and profile, and clears your comments, progress, bookmarks and saved artworks from this browser. This can't be undone." action="Delete account" confirmLabel="Yes, delete my account" onConfirm={removeAccount} />
+      <ConfirmAction danger label="Delete account" description="Permanently deletes your account, profile, comments, likes, progress, bookmarks and saved artworks. This can't be undone." action="Delete account" confirmLabel="Yes, delete my account" onConfirm={removeAccount} />
       <p role="alert" className="settings-status error">{deleteError}</p>
     </SettingsSection>
 

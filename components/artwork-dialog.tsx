@@ -3,7 +3,7 @@ import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent 
 import Link from "next/link";
 import { Icon } from "@/components/icons";
 import SymbolGlyph from "@/components/symbol-glyph";
-import { addComment, COMMENT_MAX, deleteComment, toggleLikedWork, toggleSavedWork, useComments, useLikedWorks, useSavedWorks } from "@/lib/community";
+import { addComment, COMMENT_MAX, deleteComment, loadComments, toggleLikedWork, toggleSavedWork, useComments, useLikedWorks, useSavedWorks, useWorkStats } from "@/lib/community";
 import type { Work } from "@/lib/gallery";
 import { materials, materialSlug } from "@/lib/materials";
 import { useSession } from "@/lib/session";
@@ -65,6 +65,7 @@ export default function ArtworkDialog({ works, openId, startAt, onSelect, onClos
 function ArtworkInfo({ work, headingId }: { work: Work; headingId: string }) {
   const isLiked = (useLikedWorks() ?? []).includes(work.id);
   const isSaved = (useSavedWorks() ?? []).includes(work.id);
+  const likes = work.likes + (useWorkStats()?.[work.id]?.likes ?? (isLiked ? 1 : 0));
   return <div className="art-info">
     <div className="eyebrow">{work.medium}</div>
     <h2 id={headingId}>{work.title}</h2>
@@ -81,8 +82,8 @@ function ArtworkInfo({ work, headingId }: { work: Work; headingId: string }) {
       })}
     </ul>
     <div className="art-actions">
-      <button type="button" className={`creation-action art-action${isLiked ? " liked" : ""}`} aria-label={`Appreciate ${work.title}, ${work.likes + (isLiked ? 1 : 0)} so far`} aria-pressed={isLiked} onClick={() => toggleLikedWork(work.id)}>
-        <Icon name="heart" />{isLiked ? "Appreciated" : "Appreciate"} · {work.likes + (isLiked ? 1 : 0)}
+      <button type="button" className={`creation-action art-action${isLiked ? " liked" : ""}`} aria-label={`Appreciate ${work.title}, ${likes} so far`} aria-pressed={isLiked} onClick={() => toggleLikedWork(work.id)}>
+        <Icon name="heart" />{isLiked ? "Appreciated" : "Appreciate"} · {likes}
       </button>
       <button type="button" className={`creation-action art-action${isSaved ? " saved" : ""}`} aria-label={`Save ${work.title}`} title={isSaved ? "Saved to your profile" : "Save to your profile"} aria-pressed={isSaved} onClick={() => toggleSavedWork(work.id)}>
         <Icon name="saved" />{isSaved ? "Saved" : "Save"}
@@ -93,39 +94,44 @@ function ArtworkInfo({ work, headingId }: { work: Work; headingId: string }) {
 
 function Comments({ work }: { work: Work }) {
   const account = useSession();
-  const own = (useComments() ?? []).filter((comment) => comment.workId === work.id);
+  const list = useComments(work.id);
+  const comments = list?.comments ?? [];
   const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const headingId = useId();
 
-  function submit(event: FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
-    if (!account || !text.trim()) return;
-    addComment(work.id, account, text.trim());
-    setText("");
+    if (!account || !text.trim() || busy) return;
+    setBusy(true); setError("");
+    if (await addComment(work.id, text.trim())) setText("");
+    else setError("We couldn’t post that. Please try again.");
+    setBusy(false);
   }
 
   return <section className="art-comments" aria-labelledby={headingId}>
-    <h3 id={headingId}>Comments <span>{own.length + work.comments.length}</span></h3>
+    <h3 id={headingId}>Comments <span>{comments.length + work.comments.length}</span></h3>
     {account && <form className="art-comment-form" onSubmit={submit}>
       <Initial name={account.name} />
       <div>
         <textarea aria-label={`Comment on ${work.title}`} placeholder="Share a kind word or ask a question…" rows={2} maxLength={COMMENT_MAX} value={text} onChange={(e) => setText(e.target.value)} required />
         <div className="art-comment-actions">
-          <small>Preview comments · Yours are saved on this device only.</small>
-          <button type="submit" className="primary-btn" disabled={!text.trim()}>Post</button>
+          <small role={error ? "alert" : undefined}>{error || "Everyone on Pintora can see your comment."}</small>
+          <button type="submit" className="primary-btn" disabled={!text.trim() || busy}>{busy ? "Posting…" : "Post"}</button>
         </div>
       </div>
     </form>}
+    {list?.failed && <p className="art-comments-failed" role="alert">We couldn’t load the latest comments. <button type="button" onClick={() => loadComments(work.id)}>Try again</button></p>}
     <ul className="art-comment-list">
-      {own.map((comment) => {
-        const mine = comment.authorId === account?.id;
-        // Your own comments follow your current name; others keep the one they were posted with.
-        const author = mine ? account : comment;
+      {comments.map((comment) => {
+        const mine = comment.author.id === account?.id;
+        const author = mine ? account : comment.author;
         return <li key={comment.id}>
           <Initial name={author.name} />
           <div>
             <div className="art-comment-meta"><strong>{author.name}</strong><span>@{author.username}</span><span>{timeAgo(comment.createdAt)}</span>
-              {mine && <button type="button" className="art-comment-delete" onClick={() => deleteComment(comment.id)} aria-label={`Delete your comment: ${comment.text}`}>Delete</button>}
+              {mine && <button type="button" className="art-comment-delete" onClick={() => deleteComment(work.id, comment.id)} aria-label={`Delete your comment: ${comment.text}`}>Delete</button>}
             </div>
             <p>{comment.text}</p>
           </div>

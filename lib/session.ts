@@ -91,12 +91,25 @@ const toAccount = (user: User, profile: Profile): Account => ({
   preferences: unsavedPreferences ?? toPreferences(user.user_metadata.preferences),
 });
 
+let userId: string | null | undefined;
+const userListeners = new Set<(id: string | null) => void>();
+
+/** Calls back with the signed-in person's id (null for guests) as soon as it's known, and whenever it changes. */
+export function onUserChange(listener: (id: string | null) => void) {
+  userListeners.add(listener);
+  if (userId !== undefined) listener(userId);
+}
+
 let unsavedPreferences: Preferences | null = null;
 let latestLoad = 0;
 
 async function load(user: User | null) {
   const thisLoad = ++latestLoad;
   if (state.account?.id !== user?.id) unsavedPreferences = null;
+  if (userId !== (user?.id ?? null)) {
+    userId = user?.id ?? null;
+    for (const listener of userListeners) listener(userId);
+  }
   if (!user) { setState({ account: null, failed: false }); return; }
   if (state.account?.id !== user.id) setState({ account: undefined, failed: false });
   const { data, error } = await supabase.from("profiles").select(PROFILE_COLUMNS).eq("id", user.id).single<Profile>();

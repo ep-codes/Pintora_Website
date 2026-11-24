@@ -8,7 +8,7 @@ export default function SavedPage() {
     <section className="page-intro">
       <div className="eyebrow">YOUR COLLECTION</div>
       <h1>Lessons you've<br /><em>bookmarked.</em></h1>
-      <p>Tap the bookmark on any lesson to keep it here. Bookmarks stay on this device.</p>
+      <p>Tap the bookmark on any lesson to keep it here. You’ll find them here wherever you log in.</p>
     </section>
     <LessonBrowser savedOnly />
   </SiteShell>;

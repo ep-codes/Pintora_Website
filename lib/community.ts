@@ -1,65 +1,119 @@
-import { useMemo } from "react";
-import { parseJson, readStoredString, useStoredString, writeStoredString } from "@/lib/local-store";
-import type { Account } from "@/lib/session";
+import { useEffect, useSyncExternalStore } from "react";
+import { works } from "@/lib/gallery";
+import { showNotice } from "@/lib/notice";
+import { onUserChange } from "@/lib/session";
+import { supabase } from "@/lib/supabase";
+import { readUserData, savesDone, toggleId, useUserData } from "@/lib/user-data";
 
-// Likes, saves and comments on community artwork, kept in this browser. Nothing is sent to a server.
-export type Comment = { id: string; workId: string; authorId: string; name: string; username: string; text: string; createdAt: number };
+// Likes, saves and comments on community artwork, shared by everyone on Pintora (Supabase).
 
-const LIKES_KEY = "pintora-likes";
-const SAVED_KEY = "pintora-saved-works";
-const COMMENTS_KEY = "pintora-comments";
 export const COMMENT_MAX = 300;
 
-function toIds(value: unknown): string[] {
-  return Array.isArray(value) ? value.filter((id): id is string => typeof id === "string") : [];
+/** Ids of artworks you like; `undefined` until loaded. */
+export const useLikedWorks = () => useUserData((data) => data.likes);
+
+/** Ids of artworks in the profile's Saved tab, oldest first; `undefined` until loaded. (Bookmarked lessons are in lib/saved.ts.) */
+export const useSavedWorks = () => useUserData((data) => data.savedWorks);
+export const toggleSavedWork = (id: string) => toggleId("savedWorks", id);
+
+export async function toggleLikedWork(id: string) {
+  const data = readUserData();
+  if (!data) return;
+  const change = data.likes.includes(id) ? -1 : 1;
+  changeStats(id, { likes: change });
+  if (!await toggleId("likes", id)) changeStats(id, { likes: -change });
 }
 
-function toComments(value: unknown): Comment[] {
-  if (!Array.isArray(value)) return [];
-  return value.filter((entry): entry is Comment => {
-    const { createdAt, ...rest } = (entry ?? {}) as Record<string, unknown>;
-    return typeof createdAt === "number" && ["id", "workId", "authorId", "name", "username", "text"].every((key) => typeof rest[key] === "string");
-  });
+// ---- How many likes and comments each artwork has ----
+
+type WorkStats = { likes: number; comments: number };
+let stats: Record<string, WorkStats> | undefined;
+let statChanges = 0;
+const statListeners = new Set<() => void>();
+
+function setStats(next: typeof stats) {
+  stats = next;
+  statListeners.forEach((listener) => listener());
 }
 
-const readComments = () => toComments(parseJson(readStoredString(COMMENTS_KEY)));
-const writeComments = (comments: Comment[]) => writeStoredString(COMMENTS_KEY, JSON.stringify(comments));
-
-function useIds(key: string): string[] | undefined {
-  const raw = useStoredString(key);
-  return useMemo(() => (raw === undefined ? undefined : toIds(parseJson(raw))), [raw]);
+function changeStats(id: string, { likes = 0, comments = 0 }: Partial<WorkStats>) {
+  statChanges++;
+  if (!stats) return;
+  const current = stats[id] ?? { likes: 0, comments: 0 };
+  setStats({ ...stats, [id]: { likes: Math.max(0, current.likes + likes), comments: Math.max(0, current.comments + comments) } });
 }
 
-function toggleId(key: string, id: string) {
-  const ids = toIds(parseJson(readStoredString(key)));
-  writeStoredString(key, JSON.stringify(ids.includes(id) ? ids.filter((v) => v !== id) : [...ids, id]));
+async function loadStats() {
+  await savesDone();
+  const changesBefore = statChanges;
+  const { data } = await supabase.rpc("work_stats", { work_ids: works.map((work) => work.id) });
+  if (changesBefore !== statChanges) return loadStats(); // counted before the latest click was saved
+  if (data) setStats(Object.fromEntries((data as ({ work_id: string } & WorkStats)[]).map(({ work_id, likes, comments }) => [work_id, { likes, comments }])));
 }
 
-/** Ids of liked works; `undefined` until the browser value is known. */
-export const useLikedWorks = () => useIds(LIKES_KEY);
-export const toggleLikedWork = (id: string) => toggleId(LIKES_KEY, id);
-
-/** Ids of artworks kept in the profile's Saved tab, oldest first; `undefined` until known. (Bookmarked lessons are in lib/saved.ts.) */
-export const useSavedWorks = () => useIds(SAVED_KEY);
-export const toggleSavedWork = (id: string) => toggleId(SAVED_KEY, id);
-
-/** Comments written in this browser, newest first; `undefined` until known. */
-export function useComments(): Comment[] | undefined {
-  const raw = useStoredString(COMMENTS_KEY);
-  return useMemo(() => (raw === undefined ? undefined : toComments(parseJson(raw)).sort((a, b) => b.createdAt - a.createdAt)), [raw]);
+/** Real likes and comments by artwork id (the sample ones in lib/gallery.ts come on top); `undefined` until loaded. */
+export function useWorkStats() {
+  useEffect(() => { void loadStats(); }, []);
+  return useSyncExternalStore(
+    (listener) => { statListeners.add(listener); return () => { statListeners.delete(listener); }; },
+    () => stats,
+    () => undefined,
+  );
 }
 
-export function addComment(workId: string, author: Account, text: string) {
-  writeComments([...readComments(), { id: crypto.randomUUID(), workId, authorId: author.id, name: author.name, username: author.username, text, createdAt: Date.now() }]);
+// ---- Comments ----
+
+export type Comment = { id: string; text: string; createdAt: number; author: { id: string; name: string; username: string } };
+type CommentList = { comments: Comment[]; failed: boolean };
+type CommentRow = { id: string; body: string; created_at: string; author: Comment["author"] };
+
+const COMMENT_COLUMNS = "id, body, created_at, author:profiles(id, name, username)";
+const COMMENTS_SHOWN = 200;
+let commentLists: Record<string, CommentList> = {};
+const commentListeners = new Set<() => void>();
+
+const toComment = (row: CommentRow): Comment => ({ id: row.id, text: row.body, createdAt: Date.parse(row.created_at), author: row.author });
+
+function setComments(workId: string, list: CommentList) {
+  commentLists = { ...commentLists, [workId]: list };
+  commentListeners.forEach((listener) => listener());
 }
 
-export function deleteComment(id: string) {
-  writeComments(readComments().filter((comment) => comment.id !== id));
+export async function loadComments(workId: string) {
+  const { data, error } = await supabase.from("comments").select(COMMENT_COLUMNS).eq("work_id", workId)
+    .order("created_at", { ascending: false }).limit(COMMENTS_SHOWN).overrideTypes<CommentRow[], { merge: false }>();
+  if (error) setComments(workId, { comments: commentLists[workId]?.comments ?? [], failed: true });
+  else setComments(workId, { comments: data.map(toComment), failed: false });
 }
 
-/** Used when an account is deleted. */
-export function clearCommunityActivity(authorId: string) {
-  writeStoredString(LIKES_KEY, null);
-  writeStoredString(SAVED_KEY, null);
-  writeComments(readComments().filter((comment) => comment.authorId !== authorId));
+/** Comments on an artwork, newest first; `undefined` until loaded. */
+export function useComments(workId: string): CommentList | undefined {
+  useEffect(() => { void loadComments(workId); }, [workId]);
+  return useSyncExternalStore(
+    (listener) => { commentListeners.add(listener); return () => { commentListeners.delete(listener); }; },
+    () => commentLists[workId],
+    () => undefined,
+  );
 }
+
+/** Resolves to whether the comment was posted. */
+export async function addComment(workId: string, text: string): Promise<boolean> {
+  const { data, error } = await supabase.from("comments").insert({ work_id: workId, body: text }).select(COMMENT_COLUMNS)
+    .single().overrideTypes<CommentRow, { merge: false }>();
+  if (error) return false;
+  const list = commentLists[workId] ?? { comments: [], failed: false };
+  setComments(workId, { ...list, comments: [toComment(data), ...list.comments.filter((comment) => comment.id !== data.id)] });
+  changeStats(workId, { comments: 1 });
+  return true;
+}
+
+export async function deleteComment(workId: string, id: string) {
+  const { error } = await supabase.from("comments").delete().eq("id", id);
+  if (error) { showNotice("We couldn’t delete that comment. Please try again."); return; }
+  const list = commentLists[workId];
+  if (list) setComments(workId, { ...list, comments: list.comments.filter((comment) => comment.id !== id) });
+  changeStats(workId, { comments: -1 });
+}
+
+// Nothing one person loaded is shown to the next one who logs in here.
+if (typeof window !== "undefined") onUserChange(() => { stats = undefined; commentLists = {}; });
